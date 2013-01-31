@@ -41,7 +41,7 @@ package {
          imageStream.readBytes(imageBytes);
          imageStream.close();
          
-         this._context.call( "bbm_ane_bbmsp_image_create", imageBytes );
+         this._context.call( "bbm_ane_bbmsp_image_create", imageFile.extension.toUpperCase(), imageBytes.length, imageBytes );
       }
            
       private function imageComplete(e:StatusEvent):void {

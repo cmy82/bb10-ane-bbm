@@ -7,6 +7,7 @@
 
 
 #include "Globals.h"
+#include <iostream>
 
 
 #ifdef __cplusplus
@@ -53,6 +54,7 @@ void* initRegistrationThread(void *data){
    //ane_registration_channel_id = bps_channel_get_active();
 
    if (bbmsp_request_events(0) == BBMSP_FAILURE) return NULL;
+   cout << "Request to receive BBMSP events successful" << endl;
 
    bps_event_t   *bps_event;
    bbmsp_event_t *bbmsp_event;
@@ -76,6 +78,7 @@ void* initRegistrationThread(void *data){
 
       // Process registration events only.
       if (event_category == BBMSP_REGISTRATION && event_type == BBMSP_SP_EVENT_ACCESS_CHANGED) {
+         cout << "Registration event received" << endl;
          bbmspProcessRegistration(bbmsp_event_access_changed_get_access_error_code(bbmsp_event));
       }
 
@@ -95,9 +98,11 @@ static void registrationEventComplete(bps_event_t *event){
 }
 
 static void registrationComplete(){
+   cout << "Registration done. Passing event back to main thread." << endl;
    bps_event_t *aneRegistrationEvent;
    bps_event_create(&aneRegistrationEvent, ane_master_domain, bbmStatus, NULL, &registrationEventComplete);
    bps_channel_push_event(ane_master_channel_id, aneRegistrationEvent);
+   cout << "Event passed back." << endl;
 }
 
 static void bbmspProcessRegistration(const bbmsp_access_error_codes_t status){
@@ -113,6 +118,7 @@ static void bbmspProcessRegistration(const bbmsp_access_error_codes_t status){
          if (bbmsp_is_access_allowed()) {
             progress = REGISTRATION_STOPPED;
             bbmStatus = ANE_REGISTERED;
+            cout << "Access granted" << endl;
             registrationComplete();
             return;
          }
@@ -127,6 +133,7 @@ static void bbmspProcessRegistration(const bbmsp_access_error_codes_t status){
          // keep using the same UUID when you release a new version of your
          // application.
          // You can generate one here: http://www.guidgenerator.com/
+         cout << "Calling register for uuid: " << uuid << endl;
          if (bbmsp_register(uuid)) {
             // Registration started. The user will see a dialog informing them that
             // your application is connecting to BBM.

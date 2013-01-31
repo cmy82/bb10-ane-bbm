@@ -263,9 +263,11 @@
 		]]></InfoAdditions>
         <requestedDisplayResolution>high</requestedDisplayResolution>
     </iPhone>
-    <extensions>
-        <extensionID>BSLLC.library.ane.BBM</extensionID>
+    
+
+<extensions>
         <extensionID>qnx.fuse.ui.skins.QNXSkins</extensionID>
         <extensionID>com.example.HelloAIR</extensionID>
+        <extensionID>BSLLC.library.ane.BBM</extensionID>
     </extensions>
 </application>

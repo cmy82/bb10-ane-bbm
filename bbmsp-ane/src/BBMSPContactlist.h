@@ -40,13 +40,17 @@ typedef enum {
    CONTACT_THREAD_STOPPED
 } ane_contact_thread_status_e;
 
+typedef enum {
+   CREATE_CONTACT = 0,
+   COPY_CONTACT,
+   DELETE_CONTACT
+} ane_contact_thread_action_e;
 
 //======================================================================================//
 //          CUSTOM FUNCTIONS
 //======================================================================================//
 
 void* initContactThread(void *data);
-void startContactThread();
 
 //======================================================================================//
 //                   STANDARD FUNCTIONS FROM bbmsp_util.h QNX FILE

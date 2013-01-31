@@ -37,9 +37,9 @@
    <permission system="true">run_air_native</permission>
    <permission>bbm_connect</permission>
    <action>bbm_connect</action>
+   <permission>access_shared</permission>
    
    <!--  Fourth digit segment of the package version. First three segments are taken from app 
    		 description versionNumber tag. Must be an integer from 0 to 2^16-1 -->
    <!-- <buildId>1</buildId> -->
-<permission>access_shared</permission>
 </qnx>

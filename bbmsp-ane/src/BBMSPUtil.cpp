@@ -7,6 +7,7 @@
 
 
 #include "Globals.h"
+#include <iostream>
 
 
 #ifdef __cplusplus
@@ -73,17 +74,22 @@ void* initImageThread(void *data){
             //completed passing the image id so it can be passed back to as to allow the
             //user to decide what to do next
             pthread_mutex_lock(&imageMutex);
+            cout << "Image in queue to be processed" <<endl;
             imageData = imageQueue.front();
             imageQueue.pop();
+            cout << "Pulled Image from queue" <<endl;
             pthread_mutex_unlock(&imageMutex);
 
+            cout << "Creating image and pushing into image map" <<endl;
             bbmsp_image_create(&bbmspImage,(bbmsp_image_type_t)imageData->type,imageData->data,imageData->size);
             bbmsp_image_map->insert( std::pair<int,bbmsp_image_t*>(imageData->id,bbmspImage) );
             notifyImageComplete(imageData->id);
             free(imageData);
+            cout << "Created image and pushed into map. Notified AS of completion" <<endl;
 
             pthread_mutex_lock(&imageMutex);
             queueEmpty = imageQueue.empty();
+            cout << "Checking to see if image queue is empty " << queueEmpty << endl;
             pthread_mutex_unlock(&imageMutex);
 
             if( queueEmpty ){
@@ -131,24 +137,36 @@ FREObject bbm_ane_bbmsp_image_create_empty(FREContext ctx, void* functionData,
 
 FREObject bbm_ane_bbmsp_image_create(FREContext ctx, void* functionData,
                                      uint32_t argc, FREObject argv[]){
-   uint32_t id = rand();
-   image_data_s *imageData;
+   uint32_t      id = rand();
+   image_data_s  *imageData;
    bbmsp_image_t *image;
-   FREByteArray imageBytes;
+   FREByteArray  imageBytes;
+   const uint8_t       *extension;
+   uint32_t      extLength = 5;
 
+   cout << "Create image called. Gathering data: " << time(NULL) << endl;
    imageData = (image_data_s *)malloc( sizeof(image_data_s) );
-   FREGetObjectAsInt32(argv[0],&(imageData->type));
+   FREGetObjectAsUTF8(argv[0],&extLength,&extension);
+   if( strcmp((const char*)extension,"JPG") == 0 )  imageData->type = BBMSP_IMAGE_TYPE_JPG;
+   if( strcmp((const char*)extension,"JPEG") == 0 ) imageData->type = BBMSP_IMAGE_TYPE_JPG;
+   if( strcmp((const char*)extension,"PNG") == 0 )  imageData->type = BBMSP_IMAGE_TYPE_PNG;
+   if( strcmp((const char*)extension,"GIF") == 0 )  imageData->type = BBMSP_IMAGE_TYPE_GIF;
+   if( strcmp((const char*)extension,"BMP") == 0 )  imageData->type = BBMSP_IMAGE_TYPE_BMP;
+   cout << "Image type: " << imageData->type << endl;
+   //FREGetObjectAsInt32(argv[0],&(imageData->type));
    FREGetObjectAsUint32(argv[1],&(imageData->size));
    imageData->id = id;
    FREAcquireByteArray(argv[2],&imageBytes);
+   cout << "Acquired info: " << time(NULL) << ". About to copy " << imageBytes.length << " bytes" << endl;
 
    //create random id for image, copy data into struct, push struct into queue for
    //processing and return the id
    imageData->data = (char *)malloc(imageData->size);
    for(uint32_t i=0; i<imageData->size; ++i)
       imageData->data[i] = imageBytes.bytes[i];
+   cout << "Data copied: " << time(NULL) << ". Bytes: " << sizeof(imageData->data) << endl;
 
-   FREReleaseByteArray(&imageBytes);
+   FREReleaseByteArray(argv[2]);
 
    pthread_mutex_lock(&imageMutex);
    imageQueue.push(imageData);

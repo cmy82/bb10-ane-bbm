@@ -7,6 +7,7 @@
 
 
 #include "Globals.h"
+#include <iostream>
 
 
 #ifdef __cplusplus
@@ -22,7 +23,9 @@ using namespace std;
 //======================================================================================//
 
 typedef struct {
+   ane_contact_thread_action_e action;
    uint32_t id;
+   uint32_t id2;
 
 } contact_data_s;
 
@@ -40,10 +43,6 @@ void* initContactThread(void *data){
    bps_initialize();
 
    if( bbmsp_request_events(0) == BBMSP_FAILURE ){
-      contactThreadStatus = CONTACT_THREAD_STOPPED;
-      return NULL;
-   }
-   if( bbmsp_event_contact_list_register_event() == BBMSP_FAILURE ){
       contactThreadStatus = CONTACT_THREAD_STOPPED;
       return NULL;
    }
@@ -66,13 +65,16 @@ void* initContactThread(void *data){
       //switch(contactThreadStatus){
       switch(cachedStatus){
          case CONTACT_THREAD_INITIALIZING:
-            //Thread has just started. Make call to get list of contacts with app installed
-            //and go into starting state to wait for list to be populated.
-            if( bbmsp_contact_list_get() == BBMSP_FAILURE ){
-               contactThreadStatus = CONTACT_THREAD_STOPPED;
-               return NULL;
-            } else
+            //Thread has just started and needs to wait until access to the contacts list has
+            //been granted. Once granted needs to request the contacts list then wait for it
+            //to be populated.
+            if( bbmsp_event_contact_list_register_event() != BBMSP_FAILURE ){
                contactThreadStatus = CONTACT_THREAD_STARTING;
+               cout << "About to call bbmsp_contact_list_get" << endl;
+               //if( bbmsp_contact_list_get() == BBMSP_FAILURE )
+               //   contactThreadStatus = CONTACT_THREAD_STOPPING;
+               cout << "Called bbmsp_contact_list_get" << endl;
+            }
             sleep(15);
             break;
 
@@ -124,9 +126,28 @@ void* initContactThread(void *data){
             contactQueue.pop();
             pthread_mutex_unlock(&contactMutex);
 
-            bbmsp_contact_create(&bbmspContact);
-            bbmsp_contact_map->insert( std::pair<int,bbmsp_contact_t*>(contactData->id,bbmspContact) );
-            free(contactData);
+            switch( contactData->action ){
+               case CREATE_CONTACT:
+                  //bbmspContact = (bbmsp_contact_t*)malloc( sizeof(bbmsp_contact_t) );
+                  bbmsp_contact_create(&bbmspContact);
+                  bbmsp_contact_map->insert( std::pair<int,bbmsp_contact_t*>(contactData->id,bbmspContact) );
+                  free(contactData);
+                  break;
+
+               case COPY_CONTACT:
+               {
+                  bbmsp_contact_t *orig = (*bbmsp_contact_map)[contactData->id];
+                  //bbmsp_contact_t *copy = (bbmsp_contact_t*)malloc( sizeof(bbmsp_contact_t) );;
+                  bbmsp_contact_t *copy;
+                  bbmsp_contact_create(&copy);
+                  bbmsp_contact_copy(copy,orig);
+                  bbmsp_contact_map->insert( std::pair<int,bbmsp_contact_t*>(contactData->id2,copy) );
+                  free(contactData);
+                  break;
+               }
+               case DELETE_CONTACT:
+                  break;
+            }
 
             pthread_mutex_lock(&contactMutex);
             queueEmpty = contactQueue.empty();
@@ -153,12 +174,6 @@ void* initContactThread(void *data){
    return NULL;
 }
 
-void startContactThread(){
-   //pthread_mutex_lock(&contactMutex);
-   //bbmsp_event_contact_list_register_event();
-   //contactThreadStatus = CONTACT_THREAD_STARTING;
-   //pthread_mutex_unlock(&contactMutex);
-}
 
 //======================================================================================//
 //                   STANDARD FUNCTIONS FROM bbmsp_util.h QNX FILE
@@ -168,10 +183,10 @@ void startContactThread(){
 FREObject bbm_ane_bbmsp_contact_create(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]){
    uint32_t id = rand();
    contact_data_s *contactData;
-   bbmsp_contact_t *image;
 
    contactData = (contact_data_s *)malloc( sizeof(contact_data_s) );
    contactData->id = id;
+   contactData->action = CREATE_CONTACT;
 
    pthread_mutex_lock(&contactMutex);
    contactQueue.push(contactData);
@@ -206,19 +221,22 @@ FREObject bbm_ane_bbmsp_contact_destroy(FREContext ctx, void* functionData, uint
 */
 //BBMSP_API bbmsp_result_t bbmsp_contact_copy(bbmsp_contact_t* destination, const bbmsp_contact_t* source);
 FREObject bbm_ane_bbmsp_contact_copy(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]){
-   uint32_t id = rand();
+   uint32_t imageID;
    contact_data_s *contactData;
-   bbmsp_contact_t *image;
+
+   FREGetObjectAsUint32(argv[0],&imageID);
 
    contactData = (contact_data_s *)malloc( sizeof(contact_data_s) );
-   contactData->id = id;
+   contactData->id = imageID;
+   contactData->action = COPY_CONTACT;
+   contactData->id2 = rand();
 
    pthread_mutex_lock(&contactMutex);
    contactQueue.push(contactData);
    pthread_mutex_unlock(&contactMutex);
 
    FREObject result;
-   FRENewObjectFromUint32(id, &result);
+   FRENewObjectFromUint32(contactData->id2, &result);
    return result;
 }
 

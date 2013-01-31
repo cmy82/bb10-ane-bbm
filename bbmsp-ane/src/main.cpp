@@ -188,6 +188,7 @@ static void* initAneThread(void *data){
                  //Check to see which code was passed
                  switch(eventCode){
                     case ANE_REGISTERED:
+                         //pthread_create(NULL, NULL, initContactThread, NULL);
                          aneThreadState = STARTED;
                          break;
                     case ANE_REGISTRATION_FAILED:
@@ -323,14 +324,22 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
 	                                "bbm_ane_bbmsp_send_download_invitation",
 	                                //IMAGES
 	                                "bbm_ane_bbmsp_image_create",
-	                                NULL };
+	                                "bbm_ane_bbmsp_image_destroy",
+                                   "bbm_ane_bbmsp_image_get_type",
+                                   "bbm_ane_bbmsp_image_get_data",
+                                   "bbm_ane_bbmsp_image_get_data_size",
+                                   NULL };
 	FREFunction functionPtrs[] = { sayHello,
 	                               bbm_ane_startRegistration,
 	                               bbm_ane_bbmsp_get_version,
                                   bbm_ane_bbmsp_get_domain,
                                   bbm_ane_bbmsp_send_download_invitation,
                                   bbm_ane_bbmsp_image_create,
-	                               NULL };
+	                               bbm_ane_bbmsp_image_destroy,
+                                  bbm_ane_bbmsp_image_get_type,
+                                  bbm_ane_bbmsp_image_get_data,
+                                  bbm_ane_bbmsp_image_get_data_size,
+                                  NULL };
 
 	// count number of functions
 	*numFunctionsToSet = 0;

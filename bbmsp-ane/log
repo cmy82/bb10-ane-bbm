@@ -1,0 +1,16 @@
+err: config: Failed to open file (/etc/system/config/qnxair_variant.conf): No such file or directory	(tid:1)
+Request to receive BBMSP events successful
+Access granted
+Registration done. Passing event back to main thread.
+Event passed back.
+About to call bbmsp_contact_list_get
+Called bbmsp_contact_list_get
+Create image called. Gathering data: 1359648787
+Image type: 0
+Acquired info: 1359648787. About to copy 597086 bytes
+Data copied: 1359648787. Bytes: 597086
+Image in queue to be processed
+Pulled Image from queue
+Creating image and pushing into image map
+Created image and pushed into map. Notified AS of completion
+Checking to see if image queue is empty 1
