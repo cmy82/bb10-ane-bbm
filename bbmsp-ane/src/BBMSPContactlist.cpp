@@ -71,8 +71,8 @@ void* initContactThread(void *data){
             if( bbmsp_event_contact_list_register_event() != BBMSP_FAILURE ){
                contactThreadStatus = CONTACT_THREAD_STARTING;
                cout << "About to call bbmsp_contact_list_get" << endl;
-               //if( bbmsp_contact_list_get() == BBMSP_FAILURE )
-               //   contactThreadStatus = CONTACT_THREAD_STOPPING;
+               if( bbmsp_contact_list_get() == BBMSP_FAILURE )
+                  contactThreadStatus = CONTACT_THREAD_STOPPING;
                cout << "Called bbmsp_contact_list_get" << endl;
             }
             sleep(15);
@@ -80,13 +80,16 @@ void* initContactThread(void *data){
 
          case CONTACT_THREAD_STARTING:
          {
+            cout << "Waiting on contact list to be populated" <<endl;
             //Waiting on contact list to be populated. Thread can move into this state at any time.
             bps_get_event(&bps_event, -1);
-            //If no BPS event is returned (ex if init failed) then cancel the event query
             if (!bps_event) return NULL;
+
+            cout << "BPS Event returned" <<endl;
 
             //If not a BBMSP event then go back to start of for loop
             if (bps_event_get_domain(bps_event) != bbmsp_get_domain()) break;
+            cout << "BBMSP Event returned" <<endl;
 
             // Handle a BBM Social Platform event.
             int event_category = 0;

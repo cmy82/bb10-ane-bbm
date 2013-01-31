@@ -20,6 +20,8 @@
 #include <bbmsp/bbmsp_util.h>
 #include <bbmsp/bbmsp_messaging.h>
 #include <bbmsp/bbmsp_contactlist.h>
+#include <bbmsp/bbmsp_userprofile.h>
+#include <bbmsp/bbmsp_presence.h>
 
 #include <pthread.h>
 #include <unistd.h>
@@ -30,6 +32,7 @@
 #include "BBMSPUtil.h"
 #include "BBMSPMessaging.h"
 #include "BBMSPContactlist.h"
+#include "BBMSPUserProfile.h"
 
 
 #ifndef BBMANE_GLOBALS_H_
@@ -49,18 +52,8 @@ extern int ane_image_channel_id;
 
 extern int runCount;
 
-//extern pthread_t bbmsp_thread;
-//extern pthread_t bbmsp_image_thread;
-//extern pthread_t bbmsp_contact_thread;
-//extern pthread_t bbmsp_profile_thread;
-//extern pthread_t bbmsp_profile_item_thread;
-//extern pthread_t bbmsp_profile_icon_thread;
-//extern pthread_t bbmsp_profile_item_list_thread;
-//extern pthread_t bbmsp_registration_thread;
-
 extern std::map<int,bbmsp_image_t *>                      *bbmsp_image_map;
 extern std::map<int,bbmsp_contact_t *>                    *bbmsp_contact_map;
-//extern std::map<int,bbmsp_profile_t *>                    bbmsp_profile_map;
 //extern std::map<int,bbmsp_user_profile_box_item_t *>      bbmsp_profile_item_map;
 //extern std::map<int,bbmsp_user_profile_box_icon_t *>      bbmsp_profile_icon_map;
 //extern std::map<int,bbmsp_user_profile_box_item_list_t *> bbmsp_profile_item_list_map;
@@ -71,9 +64,10 @@ typedef enum {
    ANE_REGISTRATION_FAILED
 } ane_bbmsp_status_e;
 
-extern ane_bbmsp_status_e bbmStatus;
-extern ane_image_thread_status_e imageThreadStatus;
+extern ane_bbmsp_status_e          bbmStatus;
+extern ane_image_thread_status_e   imageThreadStatus;
 extern ane_contact_thread_status_e contactThreadStatus;
+extern ane_profile_thread_status_e profileThreadStatus;
 
 extern FREContext currentContext;
 

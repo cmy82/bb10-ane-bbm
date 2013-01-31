@@ -168,6 +168,7 @@ static void* initAneThread(void *data){
               pthread_create(NULL, NULL, initRegistrationThread, NULL);
               pthread_create(NULL, NULL, initImageThread, NULL);
               pthread_create(NULL, NULL, initContactThread, NULL);
+              pthread_create(NULL, NULL, initProfileThread, NULL);
 
               aneThreadState = STARTING;
               break;

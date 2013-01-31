@@ -71,7 +71,7 @@ void* initImageThread(void *data){
          case PROCESSING_IMAGE:
             //If there is an image in the queue waiting to be constructed, pull it from the
             //queue and create it. Then push an event to the main thread once it has been
-            //completed passing the image id so it can be passed back to as to allow the
+            //completed passing the image id so it can be passed back to AS to allow the
             //user to decide what to do next
             pthread_mutex_lock(&imageMutex);
             cout << "Image in queue to be processed" <<endl;
@@ -141,7 +141,7 @@ FREObject bbm_ane_bbmsp_image_create(FREContext ctx, void* functionData,
    image_data_s  *imageData;
    bbmsp_image_t *image;
    FREByteArray  imageBytes;
-   const uint8_t       *extension;
+   const uint8_t *extension;
    uint32_t      extLength = 5;
 
    cout << "Create image called. Gathering data: " << time(NULL) << endl;
