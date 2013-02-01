@@ -1,9 +1,14 @@
   package {
+   import ane.bbm.events.ANEImageEvent;
+   import ane.bbm.BBMAne;
+   
+   
    import flash.desktop.NativeApplication;
    import flash.desktop.SystemIdleMode;
    import flash.display.Sprite;
    import flash.display.StageAlign;
    import flash.display.StageScaleMode;
+   import flash.events.Event;
    import flash.events.MouseEvent;
    
    import qnx.fuse.ui.buttons.LabelButton;
@@ -14,7 +19,7 @@
       var testLbl:Label;
       var imgHolder:Sprite;
       var bbmExtension:BBMAne;
-      var helloAIR:HelloAIR;      
+      //var helloAIR:HelloAIR;    
       
       private var uuid:String = "99b1d456-46e6-4f75-aca0-dacb4b878987"; //7-
       
@@ -69,7 +74,7 @@
          testBtn.addEventListener(MouseEvent.CLICK,testUUID);
          regBtn.addEventListener(MouseEvent.CLICK,callRegistration);
          inviteBtn.addEventListener(MouseEvent.CLICK,callSendDownload);
-         ldImgBtn.addEventListener(MouseEvent.CLICK,callLoadImage);
+         ldImgBtn.addEventListener(MouseEvent.CLICK,callLoadImage);         
          
          addChild(testBtn);
          addChild(regBtn);
@@ -80,16 +85,20 @@
          
          stage.nativeWindow.visible = true;
          NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
-                 
+         
+         this.addEventListener(Event.ADDED_TO_STAGE,init);
       }
       
-      public function testUUID(e:MouseEvent):void {
-         helloAIR = new HelloAIR();
-         var out:Object = helloAIR.sayHello();
-         //testLbl.text = out.toString();
-         
-         if( bbmExtension == null )
-            bbmExtension = new BBMAne();                    
+      private function init(e:Event):void {
+         this.removeEventListener(Event.ADDED_TO_STAGE,init);
+         if( bbmExtension == null ){
+            bbmExtension = new BBMAne();
+            bbmExtension.bbmspImages.addEventListener(ANEImageEvent.IMAGE_LOADED,retrieveImage);
+            bbmExtension.bbmspImages.addEventListener(ANEImageEvent.IMAGE_RETRIEVED,displayImage);
+         }
+      }
+      
+      public function testUUID(e:MouseEvent):void {         
          var out:Object = bbmExtension.checkStatus();
          testLbl.text = out.toString();
       }
@@ -101,6 +110,16 @@
       }
       public function callLoadImage(e:MouseEvent):void {
          bbmExtension.bbmspImages.loadImage();
+      }
+      
+      private function retrieveImage(e:ANEImageEvent):void {
+         trace("[Test.as] Image loaded. Now trying to retrieve image back from ANE: ["+e.id+"] "+e.filename);
+         var id:Number = e.id;
+         bbmExtension.bbmspImages.retrieveImage(id);
+      }
+      
+      private function displayImage(e:ANEImageEvent):void {
+         trace("[Test.as] Image retrieved and trying to display.");
       }
    }      
 }

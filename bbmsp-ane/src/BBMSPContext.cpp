@@ -6,7 +6,7 @@
  */
 
 
-#include "BBMSPContext.h"
+#include "Globals.h"
 
 
 #ifdef __cplusplus

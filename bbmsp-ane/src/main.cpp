@@ -57,9 +57,9 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
 		                        uint32_t* numFunctionsToSet, const FRENamedFunction** functionsToSet);
 void BBMANEContextFinalizer(FREContext ctx);
 
-FREObject sayHello(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]);
+FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]);
 
-FREObject sayHello(FREContext ctx, void* functionData, uint32_t argc,
+FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc,
 		             FREObject argv[]) {
 
    const char *out  = "Hello from the native code! \nANE Thread state: ";
@@ -316,7 +316,7 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
 
 	// define an array of functions
 	const char *functionNames[] = { //TEST
-	                                "sayHello",
+	                                "checkStatus",
 	                                //REGISTRATION
 	                                "bbm_ane_startRegistration",
 	                                "bbm_ane_bbmsp_get_version",
@@ -329,8 +329,12 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                    "bbm_ane_bbmsp_image_get_type",
                                    "bbm_ane_bbmsp_image_get_data",
                                    "bbm_ane_bbmsp_image_get_data_size",
+                                   //ACCESS
+                                   "bbm_ane_bbmsp_is_access_allowed",
+                                   "bbm_ane_bbmsp_can_show_profile_box",
+                                   "bbm_ane_bbmsp_can_send_bbm_invite",
                                    NULL };
-	FREFunction functionPtrs[] = { sayHello,
+	FREFunction functionPtrs[] = { checkStatus,
 	                               bbm_ane_startRegistration,
 	                               bbm_ane_bbmsp_get_version,
                                   bbm_ane_bbmsp_get_domain,
@@ -340,6 +344,9 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                   bbm_ane_bbmsp_image_get_type,
                                   bbm_ane_bbmsp_image_get_data,
                                   bbm_ane_bbmsp_image_get_data_size,
+                                  bbm_ane_bbmsp_is_access_allowed,
+                                  bbm_ane_bbmsp_can_show_profile_box,
+                                  bbm_ane_bbmsp_can_send_bbm_invite,
                                   NULL };
 
 	// count number of functions

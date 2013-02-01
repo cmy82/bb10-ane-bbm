@@ -2,6 +2,7 @@
     <id>BSLLC.library.ane.BBM</id>
     <versionNumber>1.0.0</versionNumber>
     <platforms>
+        <!--
         <platform name="QNX-x86">
             <applicationDeployment>
                 <nativeLibrary>libbbmsp-ane-x86.so</nativeLibrary>
@@ -9,6 +10,7 @@
                 <finalizer>BBMANEExtensionFinalizer</finalizer>
             </applicationDeployment>
         </platform>
+        -->
         <platform name="QNX-ARM">
             <applicationDeployment>
                 <nativeLibrary>libbbmsp-ane-arm.so</nativeLibrary>

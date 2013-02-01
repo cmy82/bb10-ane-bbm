@@ -1,8 +1,8 @@
 err: config: Failed to open file (/etc/system/config/qnxair_variant.conf): No such file or directory	(tid:1)
 Request to receive BBMSP events successful
-Access granted
-Registration done. Passing event back to main thread.
-Event passed back.
-About to call bbmsp_contact_list_get
-Called bbmsp_contact_list_get
-Waiting on contact list to be populated
+Attempting to register with BBMSP [99b1d456-46e6-4f75-aca0-dacb4b878987]
+BBMSP access is unknown
+Calling register for uuid: 99b1d456-46e6-4f75-aca0-dacb4b878987
+Attempting to register with BBMSP [99b1d456-46e6-4f75-aca0-dacb4b878987]
+BBMSP access is unknown
+Calling register for uuid: 99b1d456-46e6-4f75-aca0-dacb4b878987

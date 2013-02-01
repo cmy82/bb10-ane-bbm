@@ -6,16 +6,7 @@
  */
 
 
-#include "Globals.h"
-#include <bps/bps.h>
-#include <bps/event.h>
-#include <bbmsp/bbmsp.h>
-#include <bbmsp/bbmsp_events.h>
-#include <bbmsp/bbmsp_context.h>
-#include <bbmsp/bbmsp_util.h>
-#include <bbmsp/bbmsp_messaging.h>
-#include <bbmsp/bbmsp_contactlist.h>
-
+#include "FlashRuntimeExtensions.h"
 
 #ifndef BBMANE_BBMSP_CONTEXT_H_
 #define BBMANE_BBMSP_CONTEXT_H_

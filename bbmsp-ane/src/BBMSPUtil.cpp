@@ -31,9 +31,9 @@ typedef struct {
 
 
 ane_image_thread_status_e imageThreadStatus = IMAGE_THREAD_INITIALIZING;
-pthread_mutex_t imageMutex;
-std::queue<image_data_s *> imageQueue;
-map<int,bbmsp_image_t*> *bbmsp_image_map = new map<int,bbmsp_image_t*>();
+pthread_mutex_t           imageMutex;
+std::queue<image_data_s*> imageQueue;
+map<int,bbmsp_image_t*>   *bbmsp_image_map = new map<int,bbmsp_image_t*>();
 
 //======================================================================================//
 //          CUSTOM FUNCTIONS
@@ -48,7 +48,7 @@ void* initImageThread(void *data){
    pthread_mutex_init(&imageMutex,NULL);
 
    bbmsp_image_t *bbmspImage;
-   image_data_s *imageData;
+   image_data_s  *imageData;
 
    imageThreadStatus = WAITING_ON_IMAGE;
    bool queueEmpty = true;
@@ -99,6 +99,9 @@ void* initImageThread(void *data){
 
          case IMAGE_THREAD_STOPPING:
             //Stop all image processing and delete stored images and data.
+            for (map<int,bbmsp_image_t*>::iterator it=bbmsp_image_map->begin(); it!=bbmsp_image_map->end(); ++it)
+               bbmsp_image_destroy(&(it->second));
+            delete bbmsp_image_map;
             break;
 
          case IMAGE_THREAD_STOPPED:
@@ -219,7 +222,7 @@ FREObject bbm_ane_bbmsp_image_get_data(FREContext ctx, void* functionData,
    FREByteArray imageData;
    FREAcquireByteArray(argv[1],&imageData);
    memcpy(imageData.bytes,data,size);
-   FREReleaseByteArray(&imageData);
+   FREReleaseByteArray(argv[1]);
 
    return NULL;
 }

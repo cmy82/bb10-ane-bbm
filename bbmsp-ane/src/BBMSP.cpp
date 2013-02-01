@@ -43,6 +43,7 @@ FREObject bbm_ane_startRegistration(FREContext ctx, void* functionData, uint32_t
    strncpy(uuid,(char *)value,length);
 
    progress = REGISTRATION_STARTING;
+   cout << "Attempting to register with BBMSP [" << uuid << "]" << endl;
    bbmspProcessRegistration(bbmsp_get_access_code());
 
    return NULL;
@@ -64,9 +65,11 @@ void* initRegistrationThread(void *data){
       bps_get_event(&bps_event, -1);
       //If no BPS event is returned (ex if init failed) then cancel the event query
       if (!bps_event) return NULL;
+      cout << "BPS event received in BBMSP thread" << endl;
 
       //If not a BBMSP event then go back to start of for loop
       if (bps_event_get_domain(bps_event) != bbmsp_get_domain()) continue;
+      cout << "BBMSP event received in BBMSP thread" << endl;
 
       // Handle a BBM Social Platform event.
       int event_category = 0;
@@ -125,7 +128,10 @@ static void bbmspProcessRegistration(const bbmsp_access_error_codes_t status){
          // Need to register.
 
          // Status is not yet known. Wait for an event that will deliver the status.
-         if (status == BBMSP_ACCESS_UNKNOWN) return;
+         if (status == BBMSP_ACCESS_UNKNOWN){
+            cout << "BBMSP access is unknown" << endl;
+         //   return;
+         }
 
          // Start registration.
          // Attempt to register the application with the UUID.

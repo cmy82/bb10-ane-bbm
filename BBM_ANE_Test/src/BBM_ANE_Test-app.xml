@@ -266,6 +266,7 @@
     <extensions>
         <extensionID>BSLLC.library.ane.BBM</extensionID>
         <extensionID>qnx.fuse.ui.skins.QNXSkins</extensionID>
-        <extensionID>com.example.HelloAIR</extensionID>
+        
+    <extensionID>com.example.HelloAIR</extensionID>
     </extensions>
 </application>

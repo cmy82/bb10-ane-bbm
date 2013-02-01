@@ -19,6 +19,7 @@
 #include <bbmsp/bbmsp_context.h>
 #include <bbmsp/bbmsp_util.h>
 #include <bbmsp/bbmsp_messaging.h>
+#include <bbmsp/bbmsp_context.h>
 #include <bbmsp/bbmsp_contactlist.h>
 #include <bbmsp/bbmsp_userprofile.h>
 #include <bbmsp/bbmsp_presence.h>
@@ -30,6 +31,7 @@
 
 #include "BBMSP.h"
 #include "BBMSPUtil.h"
+#include "BBMSPContext.h"
 #include "BBMSPMessaging.h"
 #include "BBMSPContactlist.h"
 #include "BBMSPUserProfile.h"
