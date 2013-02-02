@@ -1,8 +1,27 @@
 err: config: Failed to open file (/etc/system/config/qnxair_variant.conf): No such file or directory	(tid:1)
-Request to receive BBMSP events successful
+Request to receive BBMSP events successful for ANE thread [4]
+Waiting on BPS event in BBMSP thread
+Waiting on BPS event in ANE thread
+BPS Event received in ANE thread
+Waiting on BPS event in ANE thread
+BPS Event received in ANE thread
+BBMSP event received in ANE thread
+Waiting on BPS event in ANE thread
+BPS event received in BBMSP thread
+BPS Event received in ANE thread
+BBMSP event received in ANE thread
+Waiting on BPS event in ANE thread
+Waiting on BPS event in BBMSP thread
 Attempting to register with BBMSP [99b1d456-46e6-4f75-aca0-dacb4b878987]
-BBMSP access is unknown
-Calling register for uuid: 99b1d456-46e6-4f75-aca0-dacb4b878987
-Attempting to register with BBMSP [99b1d456-46e6-4f75-aca0-dacb4b878987]
-BBMSP access is unknown
-Calling register for uuid: 99b1d456-46e6-4f75-aca0-dacb4b878987
+Access granted
+Registration done. Passing event back to main thread.
+Event passed back.
+BPS Event received in ANE thread
+Custom event for registration status received in ANE thread
+About to call bbmsp_contact_list_get
+Called bbmsp_contact_list_get
+Waiting on contact list to be populated
+BPS Event received in ContactList thread
+Contact list event
+Contact list ready to be retrieved
+Retrieved 0 contacts

@@ -30,6 +30,9 @@ typedef struct {
 } image_data_s;
 
 
+int ane_image_domain     = -1;
+int ane_image_channel_id = -1;
+
 ane_image_thread_status_e imageThreadStatus = IMAGE_THREAD_INITIALIZING;
 pthread_mutex_t           imageMutex;
 std::queue<image_data_s*> imageQueue;
@@ -41,8 +44,8 @@ map<int,bbmsp_image_t*>   *bbmsp_image_map = new map<int,bbmsp_image_t*>();
 
 void* initImageThread(void *data){
    bps_initialize();
-   //Get the channel id of this thread so child threads can push events back to it
-   //ane_image_channel_id = bps_channel_get_active();
+   ane_image_domain = bps_register_domain();
+   ane_image_channel_id = bps_channel_get_active();
 
    //Initialize mutex to control access of the image data in the map and queue
    pthread_mutex_init(&imageMutex,NULL);
@@ -121,7 +124,7 @@ static void notifyImageComplete(int id){
    char imgID[5];
    itoa(id,imgID,10);
 
-   //FREDispatchStatusEventAsync(*currentContext, (const uint8_t*)eventName, (const uint8_t*)imgID);
+   //FREDispatchStatusEventAsync(currentContext, (const uint8_t*)eventName, (const uint8_t*)imgID);
 }
 
 //======================================================================================//

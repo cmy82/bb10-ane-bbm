@@ -77,7 +77,7 @@ package ane.bbm {
          var loaderInfo:LoaderInfo = e.target as LoaderInfo;
          var loader:Loader = loaderInfo.loader;            
          var bmp:Bitmap = Bitmap(loader.content);
-         dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_RETRIEVED,0,"") );
+         dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_RETRIEVED,0,"",bmp) );
       }
       
       //======================================= MISCELLANEOUS FUNCTIONS =================================

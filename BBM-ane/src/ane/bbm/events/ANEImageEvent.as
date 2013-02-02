@@ -1,5 +1,6 @@
 package ane.bbm.events {
-   import flash.events.Event;   
+   import flash.display.Bitmap;
+   import flash.events.Event;
    
    public class ANEImageEvent extends Event {
       public static const IMAGE_LOADED:String    = "ANEImageLoaded";
@@ -7,7 +8,9 @@ package ane.bbm.events {
       
       private var _id:Number = NaN;
       private var _filename:String = "";
-      public function ANEImageEvent(type:String, value:Number, file:String = "", bubbles:Boolean=false, cancelable:Boolean=false) {
+      private var _image:Bitmap = null;
+      public function ANEImageEvent(type:String, value:Number, file:String = "", img:Bitmap = null, 
+                                    bubbles:Boolean=false, cancelable:Boolean=false) {
          super(type, bubbles, cancelable);
          _id = value;
          _filename = file;
@@ -17,6 +20,9 @@ package ane.bbm.events {
       }
       public function get filename():String {
          return _filename;
+      }
+      public function get image():Bitmap {
+         return _image;
       }
    }
 }

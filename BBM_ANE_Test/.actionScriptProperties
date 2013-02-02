@@ -34,9 +34,7 @@
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation_agent.swc" useDefaultLinkType="false"/>
         </excludedEntries>
       </libraryPathEntry>
-      <libraryPathEntry kind="1" linkType="1" path="${BLACKBERRY_TABLET_SDK}/frameworks/libs/blackberry"/>
       <libraryPathEntry kind="1" linkType="1" path="${BLACKBERRY_TABLET_SDK}/frameworks/libs/qnx"/>
-      <libraryPathEntry kind="3" linkType="2" path="${BLACKBERRY_TABLET_SDK}/frameworks/libs/air/qnx-air.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="3" linkType="1" path="X:/BBDEV/PlayBook/Flash Builder/BBM-ane/bin/BBM-ane.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="5" linkType="2" path="${BLACKBERRY_TABLET_SDK}/frameworks/libs/qnx/ane/QNXSkins.ane"/>
       <libraryPathEntry kind="5" linkType="2" path="X:/BBDEV/QNX/WKSPCE/bbmsp-ane/packaged-ane/bbmsp-ane.ane"/>
@@ -54,22 +52,22 @@
   <flashCatalyst validateFlashCatalystCompatibility="false"/>
   <buildTargets>
     <buildTarget buildTargetName="com.qnx.flexide.multiplatform.qnx.platform" extraPackagingOptions="" signBarFile="false">
-      <multiPlatformSettings enabled="true" includePlatformLibs="false" platformID="com.qnx.flexide.multiplatform.qnx.platform" version="2"/>
       <airSettings airCertificatePath="" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes/>
         <anePaths>
-          <anePathEntry path="C:/Program Files/Research In Motion/BlackBerry AIR SDK/blackberry-tablet-sdk-3.0.0-gold/frameworks/libs/qnx/ane/QNXSkins.ane"/>
+          <anePathEntry path="X:/Program Files/Research In Motion/BlackBerry AIR SDK/blackberry-tablet-sdk-3.0.0-gold/frameworks/libs/qnx/ane/QNXSkins.ane"/>
           <anePathEntry path="X:/BBDEV/QNX/WKSPCE/bbmsp-ane/packaged-ane/bbmsp-ane.ane"/>
         </anePaths>
       </airSettings>
+      <multiPlatformSettings enabled="true" includePlatformLibs="false" platformID="com.qnx.flexide.multiplatform.qnx.platform" version="2"/>
       <actionScriptSettings version="1"/>
     </buildTarget>
     <buildTarget buildTargetName="default">
-      <multiPlatformSettings enabled="false" includePlatformLibs="false" platformID="default" version="2"/>
       <airSettings airCertificatePath="" airTimestamp="true" anePathSet="false" version="1">
         <airExcludes/>
         <anePaths/>
       </airSettings>
+      <multiPlatformSettings enabled="false" includePlatformLibs="false" platformID="default" version="2"/>
       <actionScriptSettings version="1"/>
     </buildTarget>
   </buildTargets>

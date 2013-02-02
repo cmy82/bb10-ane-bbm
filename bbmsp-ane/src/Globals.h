@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <iostream>
 #include <map>
 
 #include <bps/bps.h>
@@ -49,8 +50,12 @@ extern "C" {
 
 extern int ane_master_domain;           //Used to check the domain for events from the ANE
 extern int ane_master_channel_id;       //Used so child channels can push events back to main channel
+extern int ane_registration_domain;
 extern int ane_registration_channel_id;
+extern int ane_image_domain;
 extern int ane_image_channel_id;
+extern int ane_contact_domain;
+extern int ane_contact_channel_id;
 
 extern int runCount;
 

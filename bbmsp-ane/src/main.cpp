@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 //======================================================================================//
-//          INITIALIZE NEEDED GLOBAL VARIABLES
+//          INITIALIZE NEEDED GLOBAL VARIABLES & FUNCTION STUBS
 //======================================================================================//
 
 int runCount = 0;
@@ -32,7 +32,7 @@ int extensionInit = 0;
 char * test;
 
 int ane_master_domain;           //Used to check the domain for events from the ANE
-int ane_master_channel_id;       //Used so child channels can push events back to main channel
+int ane_master_channel_id = -1;  //Used so child channels can push events back to main channel
 
 typedef enum {
    INITIALIZING = 0,
@@ -45,9 +45,6 @@ typedef enum {
 ane_thread_state_e aneThreadState = INITIALIZING;
 
 
-//END
-
-
 void BBMANEExtensionInitializer(void** extDataToSet,
 		                          FREContextInitializer* ctxInitializerToSet,
 		                          FREContextFinalizer* ctxFinalizerToSet);
@@ -58,6 +55,11 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
 void BBMANEContextFinalizer(FREContext ctx);
 
 FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]);
+static void bpsEventComplete(bps_event_t *event);
+
+//======================================================================================//
+//          CUSTOM FUNCTIONS
+//======================================================================================//
 
 FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc,
 		             FREObject argv[]) {
@@ -156,6 +158,8 @@ static void* initAneThread(void *data){
    // a different result. Check that you are using the BlackBerry Messenger
    // permission in your bar-descriptor.xml file.
    if (bbmsp_request_events(0) == BBMSP_FAILURE) return NULL;
+   cout << "Request to receive BBMSP events successful for ANE thread [" <<
+         ane_master_channel_id << "]" << endl;
 
    bps_event_t   *event;
    bbmsp_event_t *bbmspEvent;
@@ -168,7 +172,7 @@ static void* initAneThread(void *data){
               pthread_create(NULL, NULL, initRegistrationThread, NULL);
               pthread_create(NULL, NULL, initImageThread, NULL);
               pthread_create(NULL, NULL, initContactThread, NULL);
-              pthread_create(NULL, NULL, initProfileThread, NULL);
+              //pthread_create(NULL, NULL, initProfileThread, NULL);
 
               aneThreadState = STARTING;
               break;
@@ -180,17 +184,45 @@ static void* initAneThread(void *data){
               int eventDomain;
               int eventCode;
 
+              cout << "Waiting on BPS event in ANE thread" << endl;
               bps_get_event(&event, -1);
               eventDomain = bps_event_get_domain(event);
+
+              cout << "BPS Event received in ANE thread" << endl;
+
+              if (bps_event_get_domain(event) == bbmsp_get_domain()) {
+                 bbmsp_event_t *bbmsp_event;
+
+                 cout << "BBMSP event received in ANE thread" << endl;
+
+                 // Handle a BBM Social Platform event.
+                 int event_category = 0;
+                 int event_type = 0;
+
+                 bbmsp_event_get_category(event, &event_category);
+                 bbmsp_event_get_type(event, &event_type);
+                 bbmsp_event_get(event, &bbmsp_event);
+
+                 // Process registration events only at this point.
+                 if (event_category == BBMSP_REGISTRATION && event_type == BBMSP_SP_EVENT_ACCESS_CHANGED) {
+                    bps_event_t *aneRegistrationEvent;
+                    bps_event_create(&aneRegistrationEvent, ane_registration_domain,
+                                     bbmsp_event_access_changed_get_access_error_code(bbmsp_event),
+                                     NULL, &bpsEventComplete);
+                    bps_channel_push_event(ane_registration_channel_id, aneRegistrationEvent);
+                 }
+                 break;
+              }
 
               //Only check for event passed to the ANEs domain
               if( eventDomain == ane_master_domain ){
                  eventCode = bps_event_get_code(event);
+                 cout << "Custom event for registration status received in ANE thread" << endl;
                  //Check to see which code was passed
                  switch(eventCode){
                     case ANE_REGISTERED:
-                         //pthread_create(NULL, NULL, initContactThread, NULL);
                          aneThreadState = STARTED;
+                         //pthread_create(NULL, NULL, initContactThread, NULL);
                          break;
                     case ANE_REGISTRATION_FAILED:
                          aneThreadState = STOPPING;
@@ -227,7 +259,21 @@ static void* initAneThread(void *data){
               }
 
               if( eventCategory == BBMSP_CONTACT_LIST ){
-
+                 cout << "Contact list event" << endl;
+                 if(eventType == BBMSP_SP_EVENT_CONTACT_LIST_FULL) {
+                    //bbmsp_event_contact_list_get_full_contact_list(bbmsp_event,&contactList);
+                    //contactThreadStatus = WAITING_ON_CONTACT;
+                    cout << "Contact list has been populated" << endl;
+                    bps_event_t *aneContactListEvent;
+                    //bps_event_create(&aneContacTListEvent, ane_contact_domain,
+                    //                 bbmsp_event_access_changed_get_access_error_code(bbmsp_event),
+                    //                 NULL, &bpsEventComplete);
+                    //bps_channel_push_event(ane_contact_channel_id, aneContactListEvent);
+                 }
+                 if(eventType == BBMSP_SP_EVENT_CONTACT_CHANGED){
+                    cout << "Contact info has changed" << endl;
+                 }
+                 break;
               }
 
               if( eventCategory == BBMSP_CONNECTION ){
@@ -252,6 +298,16 @@ static void* initAneThread(void *data){
    bps_shutdown();
    return NULL;
 }
+
+
+static void bpsEventComplete(bps_event_t *event){
+   bps_event_destroy(event);
+}
+
+//======================================================================================//
+//          NATIVE FUNCTIONS
+//======================================================================================//
+
 
 /**
  * The runtime calls this method once when it loads an ActionScript extension.
@@ -369,6 +425,7 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
 	}
 
 	*functionsToSet = functionSet;
+	//currentContext = ctx;
 }
 
 /**

@@ -35,24 +35,24 @@ std::queue<contact_data_s *> contactQueue;
 map<int,bbmsp_contact_t *>   *bbmsp_contact_map = new map<int,bbmsp_contact_t*>();
 bbmsp_contact_list_t         *contactList;
 
+int ane_contact_domain     = -1;
+int ane_contact_channel_id = -1;
+
 //======================================================================================//
 //          CUSTOM FUNCTIONS
 //======================================================================================//
 
 void* initContactThread(void *data){
    bps_initialize();
-
-   if( bbmsp_request_events(0) == BBMSP_FAILURE ){
-      contactThreadStatus = CONTACT_THREAD_STOPPED;
-      return NULL;
-   }
+   ane_contact_domain = bps_register_domain();
+   ane_contact_channel_id = bps_channel_get_active();
 
    pthread_mutex_init(&contactMutex,NULL);
 
    bbmsp_contact_t *bbmspContact;
-   contact_data_s *contactData;
-   bps_event_t   *bps_event;
-   bbmsp_event_t *bbmsp_event;
+   contact_data_s  *contactData;
+   bps_event_t     *bps_event;
+   bbmsp_event_t   *bbmspEvent;
 
    bool queueEmpty = true;
    ane_contact_thread_status_e cachedStatus;
@@ -85,24 +85,22 @@ void* initContactThread(void *data){
             bps_get_event(&bps_event, -1);
             if (!bps_event) return NULL;
 
-            cout << "BPS Event returned" <<endl;
+            cout << "BPS Event received in ContactList thread" <<endl;
+            int eventCategory = 0;
+            int eventType = 0;
 
-            //If not a BBMSP event then go back to start of for loop
-            if (bps_event_get_domain(bps_event) != bbmsp_get_domain()) break;
-            cout << "BBMSP Event returned" <<endl;
+            bbmsp_event_get_category(bps_event, &eventCategory);
+            bbmsp_event_get_type(bps_event, &eventType);
+            bbmsp_event_get(bps_event, &bbmspEvent);
 
-            // Handle a BBM Social Platform event.
-            int event_category = 0;
-            int event_type = 0;
-
-            bbmsp_event_get_category(bps_event, &event_category);
-            bbmsp_event_get_type(bps_event, &event_type);
-            bbmsp_event_get(bps_event, &bbmsp_event);
-
-            // Process registration events only.
-            if (event_category == BBMSP_CONTACT_LIST && event_type == BBMSP_SP_EVENT_CONTACT_LIST_FULL) {
-               bbmsp_event_contact_list_get_full_contact_list(bbmsp_event,&contactList);
-               contactThreadStatus = WAITING_ON_CONTACT;
+            if( eventCategory == BBMSP_CONTACT_LIST ){
+                cout << "Contact list event" << endl;
+                if(eventType == BBMSP_SP_EVENT_CONTACT_LIST_FULL) {
+                   cout << "Contact list ready to be retrieved" << endl;
+                   bbmsp_event_contact_list_get_full_contact_list(bbmspEvent,&contactList);
+                   cout << "Retrieved " << bbmsp_contact_list_get_size(contactList) << " contacts" << endl;
+                   contactThreadStatus = WAITING_ON_CONTACT;
+                }
             }
             break;
          }
@@ -566,6 +564,7 @@ FREObject bbm_ane_bbmsp_contact_list_get_size(FREContext ctx, void* functionData
    FRENewObjectFromUint32(size, &result);
    return result;
 }
+
 
 
 

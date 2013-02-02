@@ -1,10 +1,10 @@
-  package {
-   import ane.bbm.events.ANEImageEvent;
+                                                                                                                                                          package {
    import ane.bbm.BBMAne;
-   
+   import ane.bbm.events.ANEImageEvent;
    
    import flash.desktop.NativeApplication;
    import flash.desktop.SystemIdleMode;
+   import flash.display.Bitmap;
    import flash.display.Sprite;
    import flash.display.StageAlign;
    import flash.display.StageScaleMode;
@@ -120,6 +120,8 @@
       
       private function displayImage(e:ANEImageEvent):void {
          trace("[Test.as] Image retrieved and trying to display.");
+         var pic:Bitmap = e.image;
+         imgHolder.addChild(pic);
       }
    }      
 }
