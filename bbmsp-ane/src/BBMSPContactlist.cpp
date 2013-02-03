@@ -100,10 +100,12 @@ void* initContactThread(void *data){
                    bbmsp_event_contact_list_get_full_contact_list(bbmspEvent,&contactList);
                    cout << "Retrieved " << bbmsp_contact_list_get_size(contactList) << " contacts" << endl;
                    contactThreadStatus = WAITING_ON_CONTACT;
+                   notifyContactListLoaded();
                 }
             }
-            break;
          }
+            break;
+
          case WAITING_ON_CONTACT:
             //If no images in queue then sleep for 15 seconds and check again. Once queue has
             //an image then process it
@@ -175,6 +177,11 @@ void* initContactThread(void *data){
    return NULL;
 }
 
+static void notifyContactListLoaded(){
+   const char *eventName = "ANEContactListLoaded";
+
+   FREDispatchStatusEventAsync(currentContext, (const uint8_t*)eventName, (const uint8_t*)"");
+}
 
 //======================================================================================//
 //                   STANDARD FUNCTIONS FROM bbmsp_util.h QNX FILE

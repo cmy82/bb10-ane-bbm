@@ -77,22 +77,18 @@ void* initImageThread(void *data){
             //completed passing the image id so it can be passed back to AS to allow the
             //user to decide what to do next
             pthread_mutex_lock(&imageMutex);
-            cout << "Image in queue to be processed" <<endl;
             imageData = imageQueue.front();
             imageQueue.pop();
-            cout << "Pulled Image from queue" <<endl;
             pthread_mutex_unlock(&imageMutex);
 
-            cout << "Creating image and pushing into image map" <<endl;
             bbmsp_image_create(&bbmspImage,(bbmsp_image_type_t)imageData->type,imageData->data,imageData->size);
             bbmsp_image_map->insert( std::pair<int,bbmsp_image_t*>(imageData->id,bbmspImage) );
             notifyImageComplete(imageData->id);
+            delete imageData->data;
             free(imageData);
-            cout << "Created image and pushed into map. Notified AS of completion" <<endl;
 
             pthread_mutex_lock(&imageMutex);
             queueEmpty = imageQueue.empty();
-            cout << "Checking to see if image queue is empty " << queueEmpty << endl;
             pthread_mutex_unlock(&imageMutex);
 
             if( queueEmpty ){
@@ -123,23 +119,12 @@ static void notifyImageComplete(int id){
    const char *eventName = "ANEImageLoaded";
    char imgID[5];
    itoa(id,imgID,10);
-
-   //FREDispatchStatusEventAsync(currentContext, (const uint8_t*)eventName, (const uint8_t*)imgID);
+   FREDispatchStatusEventAsync(currentContext, (const uint8_t*)eventName, (const uint8_t*)imgID);
 }
 
 //======================================================================================//
 //                   STANDARD FUNCTIONS FROM bbmsp_util.h QNX FILE
 //======================================================================================//
-
-//BBMSP_API int bbmsp_image_create_empty(bbmsp_image_t** image);
-FREObject bbm_ane_bbmsp_image_create_empty(FREContext ctx, void* functionData,
-                                           uint32_t argc, FREObject argv[]){
-   int code = 0;
-   FREObject result;
-   FRENewObjectFromInt32(code, &result);
-   return result;
-}
-
 
 FREObject bbm_ane_bbmsp_image_create(FREContext ctx, void* functionData,
                                      uint32_t argc, FREObject argv[]){
@@ -150,7 +135,6 @@ FREObject bbm_ane_bbmsp_image_create(FREContext ctx, void* functionData,
    const uint8_t *extension;
    uint32_t      extLength = 5;
 
-   cout << "Create image called. Gathering data: " << time(NULL) << endl;
    imageData = (image_data_s *)malloc( sizeof(image_data_s) );
    FREGetObjectAsUTF8(argv[0],&extLength,&extension);
    if( strcmp((const char*)extension,"JPG") == 0 )  imageData->type = BBMSP_IMAGE_TYPE_JPG;
@@ -158,20 +142,15 @@ FREObject bbm_ane_bbmsp_image_create(FREContext ctx, void* functionData,
    if( strcmp((const char*)extension,"PNG") == 0 )  imageData->type = BBMSP_IMAGE_TYPE_PNG;
    if( strcmp((const char*)extension,"GIF") == 0 )  imageData->type = BBMSP_IMAGE_TYPE_GIF;
    if( strcmp((const char*)extension,"BMP") == 0 )  imageData->type = BBMSP_IMAGE_TYPE_BMP;
-   cout << "Image type: " << imageData->type << endl;
-   //FREGetObjectAsInt32(argv[0],&(imageData->type));
+
    FREGetObjectAsUint32(argv[1],&(imageData->size));
    imageData->id = id;
+
    FREAcquireByteArray(argv[2],&imageBytes);
-   cout << "Acquired info: " << time(NULL) << ". About to copy " << imageBytes.length << " bytes" << endl;
-
-   //create random id for image, copy data into struct, push struct into queue for
-   //processing and return the id
-   imageData->data = (char *)malloc(imageData->size);
-   for(uint32_t i=0; i<imageData->size; ++i)
+   imageData->data = new char[imageData->size];
+   for(uint32_t i=0; i<imageData->size; ++i){
       imageData->data[i] = imageBytes.bytes[i];
-   cout << "Data copied: " << time(NULL) << ". Bytes: " << sizeof(imageData->data) << endl;
-
+   }
    FREReleaseByteArray(argv[2]);
 
    pthread_mutex_lock(&imageMutex);
@@ -224,7 +203,10 @@ FREObject bbm_ane_bbmsp_image_get_data(FREContext ctx, void* functionData,
 
    FREByteArray imageData;
    FREAcquireByteArray(argv[1],&imageData);
-   memcpy(imageData.bytes,data,size);
+   //memcpy(imageData.bytes,data,size);
+   for(uint32_t i=0; i<size; ++i){
+      imageData.bytes[i] = data[i];
+   }
    FREReleaseByteArray(argv[1]);
 
    return NULL;

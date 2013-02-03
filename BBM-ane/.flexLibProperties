@@ -4,6 +4,10 @@
     <classEntry path="ane.bbm.BBMMessaging"/>
     <classEntry path="ane.bbm.BBMSPUtil"/>
     <classEntry path="ane.bbm.events.ANEImageEvent"/>
+    <classEntry path="ane.bbm.BBMSPUserProfile"/>
+    <classEntry path="ane.bbm.events.ANEUserProfileEvent"/>
+    <classEntry path="ane.bbm.BBMSPContactList"/>
+    <classEntry path="ane.bbm.BBMSPContext"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

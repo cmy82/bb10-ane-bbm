@@ -14,6 +14,7 @@ package ane.bbm.events {
          super(type, bubbles, cancelable);
          _id = value;
          _filename = file;
+		 _image = img;
       }
       public function get id():Number {
          return _id;

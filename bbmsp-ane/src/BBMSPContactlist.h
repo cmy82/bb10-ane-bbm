@@ -51,6 +51,7 @@ typedef enum {
 //======================================================================================//
 
 void* initContactThread(void *data);
+static void notifyContactListLoaded();
 
 //======================================================================================//
 //                   STANDARD FUNCTIONS FROM bbmsp_util.h QNX FILE

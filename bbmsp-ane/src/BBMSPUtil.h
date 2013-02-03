@@ -42,11 +42,6 @@ static void notifyImageComplete(int id);
 //                   STANDARD FUNCTIONS FROM bbmsp_util.h QNX FILE
 //======================================================================================//
 
-//BBMSP_API int bbmsp_image_create_empty(bbmsp_image_t** image);
-FREObject bbm_ane_bbmsp_image_create_empty(FREContext ctx, void* functionData,
-                                           uint32_t argc, FREObject argv[]);
-
-
 /**
  * @brief Creates a new @c bbmsp_image_t to hold an image.
  *

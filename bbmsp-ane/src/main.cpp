@@ -26,6 +26,8 @@ extern "C" {
 //          INITIALIZE NEEDED GLOBAL VARIABLES & FUNCTION STUBS
 //======================================================================================//
 
+FREContext currentContext;
+
 int runCount = 0;
 int contextInit = 0;
 int extensionInit = 0;
@@ -64,6 +66,8 @@ static void bpsEventComplete(bps_event_t *event);
 FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc,
 		             FREObject argv[]) {
 
+   //currentContext = ctx; //=======//
+
    const char *out  = "Hello from the native code! \nANE Thread state: ";
 	const char *out2 = ". \nBBM status: ";
 	const char *out3 = ". \nANE domain and channel: ";
@@ -72,7 +76,8 @@ FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc,
 	const char *out6 = " [";
 	const char *out7 = "]. \nContact thread: ";
 	const char *out8 = " [";
-   const char *out9 = "]. ";
+   const char *out9 = "]. \nProfile thread: ";
+   const char *out10 = ".";
 
 	char temp[200];
 	char temp2[13];
@@ -83,6 +88,8 @@ FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc,
 	char temp7[5];
 	char temp8[13];
 	char temp9[5];
+	char temp10[13];
+
 
 	itoa(runCount,temp3,10);
 	itoa(ane_master_domain,temp4,10);
@@ -121,6 +128,15 @@ FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc,
       case CONTACT_THREAD_STOPPED:      strncpy(temp8,"STOPPED\0",8); break;
    }
 
+	switch( profileThreadStatus ){
+      case PROFILE_THREAD_INITIALIZING: strncpy(temp10,"INIT\0",5); break;
+      case PROFILE_THREAD_STARTING:     strncpy(temp10,"STARTING\0",9); break;
+      case LOADING_PROFILE:             strncpy(temp10,"LOADING\0",8); break;
+      case LOADED_PROFILE:              strncpy(temp10,"LOADED\0",11); break;
+      case PROFILE_THREAD_STOPPING:     strncpy(temp10,"STOPPING\0",9); break;
+      case PROFILE_THREAD_STOPPED:      strncpy(temp10,"STOPPED\0",8); break;
+   }
+
 	strcpy(temp,out);
 	strcat(temp,temp2);
 	strcat(temp,out3);
@@ -138,11 +154,11 @@ FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc,
    strcat(temp,out8);
    strcat(temp,temp9);
    strcat(temp,out9);
+   strcat(temp,temp10);
+   strcat(temp,out10);
 
 	FREObject result;
-	//FRENewObjectFromUTF8((uint32_t)(strlen(out) + 1), (uint8_t*) out, &result);
 	FRENewObjectFromUTF8((uint32_t)(strlen(temp) + 1), (uint8_t*)temp, &result);
-	//count++;
 	return result;
 }
 
@@ -172,7 +188,7 @@ static void* initAneThread(void *data){
               pthread_create(NULL, NULL, initRegistrationThread, NULL);
               pthread_create(NULL, NULL, initImageThread, NULL);
               pthread_create(NULL, NULL, initContactThread, NULL);
-              //pthread_create(NULL, NULL, initProfileThread, NULL);
+              pthread_create(NULL, NULL, initProfileThread, NULL);
 
               aneThreadState = STARTING;
               break;
@@ -221,17 +237,21 @@ static void* initAneThread(void *data){
                  //Check to see which code was passed
                  switch(eventCode){
                     case ANE_REGISTERED:
+                         bps_event_t *aneProfileEvent;
+                         bps_event_create(&aneProfileEvent, ane_profile_domain,
+                                          START_LOADING_PROFILE, NULL, &bpsEventComplete);
+                         bps_channel_push_event(ane_profile_channel_id, aneProfileEvent);
+
                          aneThreadState = STARTED;
-                         //pthread_create(NULL, NULL, initContactThread, NULL);
                          break;
                     case ANE_REGISTRATION_FAILED:
                          aneThreadState = STOPPING;
                          break;
                  }
               }
-
-              break;
          }
+              break;
+
          //In this state the ANE thread is running and dispatching events to child threads as
          //needed
          case STARTED:
@@ -251,7 +271,12 @@ static void* initAneThread(void *data){
               bbmsp_event_get(event, &bbmspEvent);
 
               if( eventCategory == BBMSP_USER_PROFILE ){
-
+                 if( eventType == BBMSP_SP_EVENT_PROFILE_CHANGED ){
+                    bps_event_t *aneProfileEvent;
+                    bps_event_create(&aneProfileEvent, ane_profile_domain,
+                                     PROFILE_CHANGED_RELOAD, NULL, &bpsEventComplete);
+                    bps_channel_push_event(ane_profile_channel_id, aneProfileEvent);
+                 }
               }
 
               if( eventCategory == BBMSP_USER_PROFILE_BOX ){
@@ -259,28 +284,17 @@ static void* initAneThread(void *data){
               }
 
               if( eventCategory == BBMSP_CONTACT_LIST ){
-                 cout << "Contact list event" << endl;
-                 if(eventType == BBMSP_SP_EVENT_CONTACT_LIST_FULL) {
-                    //bbmsp_event_contact_list_get_full_contact_list(bbmsp_event,&contactList);
-                    //contactThreadStatus = WAITING_ON_CONTACT;
-                    cout << "Contact list has been populated" << endl;
-                    bps_event_t *aneContactListEvent;
-                    //bps_event_create(&aneContacTListEvent, ane_contact_domain,
-                    //                 bbmsp_event_access_changed_get_access_error_code(bbmsp_event),
-                    //                 NULL, &bpsEventComplete);
-                    //bps_channel_push_event(ane_contact_channel_id, aneContactListEvent);
-                 }
-                 if(eventType == BBMSP_SP_EVENT_CONTACT_CHANGED){
-                    cout << "Contact info has changed" << endl;
-                 }
+                 //These event should be caught by contact thread since those events are
+                 //registered separately
                  break;
               }
 
               if( eventCategory == BBMSP_CONNECTION ){
 
               }
-              break;
          }
+              break;
+
          //In this state the ANE thread is waiting for all child threads to shutdown
          case STOPPING:
               break;
@@ -389,6 +403,20 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                    "bbm_ane_bbmsp_is_access_allowed",
                                    "bbm_ane_bbmsp_can_show_profile_box",
                                    "bbm_ane_bbmsp_can_send_bbm_invite",
+                                   //PROFILE
+                                   "bbm_ane_bbmsp_profile_get_display_name",
+                                   "bbm_ane_bbmsp_profile_get_personal_message",
+                                   "bbm_ane_bbmsp_profile_get_status",
+                                   "bbm_ane_bbmsp_profile_get_status_message",
+                                   "bbm_ane_bbmsp_profile_get_handle",
+                                   "bbm_ane_bbmsp_profile_get_ppid",
+                                   "bbm_ane_bbmsp_profile_get_app_version",
+                                   "bbm_ane_bbmsp_profile_get_display_picture",
+                                   "bbm_ane_bbmsp_profile_set_display_picture",
+                                   "bbm_ane_bbmsp_set_user_profile_display_picture",
+                                   "bbm_ane_bbmsp_profile_set_status",
+                                   "bbm_ane_bbmsp_profile_set_personal_message",
+                                   "bbm_ane_bbmsp_set_user_profile_personal_message",
                                    NULL };
 	FREFunction functionPtrs[] = { checkStatus,
 	                               bbm_ane_startRegistration,
@@ -403,6 +431,18 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                   bbm_ane_bbmsp_is_access_allowed,
                                   bbm_ane_bbmsp_can_show_profile_box,
                                   bbm_ane_bbmsp_can_send_bbm_invite,
+                                  bbm_ane_bbmsp_profile_get_display_name,
+                                  bbm_ane_bbmsp_profile_get_personal_message,
+                                  bbm_ane_bbmsp_profile_get_status,
+                                  bbm_ane_bbmsp_profile_get_status_message,
+                                  bbm_ane_bbmsp_profile_get_handle,
+                                  bbm_ane_bbmsp_profile_get_ppid,
+                                  bbm_ane_bbmsp_profile_get_app_version,
+                                  bbm_ane_bbmsp_profile_get_display_picture,
+                                  bbm_ane_bbmsp_profile_set_display_picture,
+                                  bbm_ane_bbmsp_set_user_profile_display_picture,
+                                  bbm_ane_bbmsp_profile_set_status,
+                                  bbm_ane_bbmsp_profile_set_personal_message,
                                   NULL };
 
 	// count number of functions
@@ -425,7 +465,7 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
 	}
 
 	*functionsToSet = functionSet;
-	//currentContext = ctx;
+	currentContext = ctx;
 }
 
 /**

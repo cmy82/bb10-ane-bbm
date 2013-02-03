@@ -2,6 +2,7 @@ package ane.bbm {
    import ane.bbm.events.ANEImageEvent;
    
    import flash.display.Bitmap;
+   import flash.display.BitmapData;
    import flash.display.Loader;
    import flash.display.LoaderInfo;
    import flash.events.Event;
@@ -25,6 +26,54 @@ package ane.bbm {
          _imageList = new Vector.<ImageTracker>();
       }
 
+	   //================================== DATA FUNCTIONS ====================================
+	   public function getImageType(id:Number):String {
+         for( var i:int = 0; i<_imageList.length; i++ ){
+            if( _imageList[i].id == id ){
+               _imageList[i] = null;
+               var result:Object = this._context.call( "bbm_ane_bbmsp_image_get_type", id );
+               var type:Number = Number(result);
+               switch(type){
+                  case 0:
+                     return "JPG";
+                     break;
+                  case 1:
+                     return "PNG";
+                     break;
+                  case 2:
+                     return "GIF";
+                     break
+                  case 3:
+                     return "BMP";
+                     break;
+               }              
+            }
+         }
+         return "Unknown";
+	   }
+	  
+	   public function getImageSize(id:Number):Number {
+         for( var i:int = 0; i<_imageList.length; i++ ){
+            if( _imageList[i].id == id ){
+	 			  _imageList[i] = null;
+               var result:Object = this._context.call( "bbm_ane_bbmsp_image_get_data_size", id );
+ 				  return Number(result); 
+			   }
+		   }
+		   return -1;  
+	   }
+	   
+	   public function deleteImage(id:Number):Number {
+	 	   for( var i:int = 0; i<_imageList.length; i++ ){
+ 			   if( _imageList[i].id == id ){ 
+				   _imageList[i] = null;
+				   var result:Object = this._context.call( "bbm_ane_bbmsp_image_destroy", id );
+				   return Number(result );
+			   }
+		   }
+		   return -1;
+	   }
+	  
       //================================== LOADING FUNCTIONS ====================================
       public function loadImage():void {
          var dir:File = File.userDirectory.resolvePath( 'shared/photos' );
@@ -53,38 +102,37 @@ package ane.bbm {
             _imageList.push(image);
          } else {
             var image2:ImageTracker = findByName(imageFile.name);
-            trace("[BBMSPUtil.as] Dispatching loaded event from already loaded image");
-            dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_LOADED,image2.id,imageFile.name) );
-            trace("[BBMSPUtil.as] Dispatched loaded event");
+            dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_LOADED,image2.id,imageFile.name) );            
          }
       }
       
       //=============================== RETRIEVING FUNCTIONS ====================================
       public function retrieveImage(id:Number):void {
-         trace( "Trying to return image file from ANE");
          var size:Object = this._context.call( "bbm_ane_bbmsp_image_get_data_size", id );
          var imgData:ByteArray = new ByteArray();
          imgData.length = Number(size);
-         this._context.call( "bbm_ane_bbmsp_image_get_data", id, imgData );
-         trace("Retrieved size "+size.toString()+" and data. Passing data to Loader object.");
+         
+		   this._context.call( "bbm_ane_bbmsp_image_get_data", id, imgData );
+         
          var loader:Loader = new Loader();
          loader.contentLoaderInfo.addEventListener(Event.COMPLETE,imageLoaded)
          loader.loadBytes(imgData);         
       }
                                
       private function imageLoaded(e:Event):void {
-         trace("[BBMSPUtil.as] Image retrieved from ANE. Converting to bitmap object");
          var loaderInfo:LoaderInfo = e.target as LoaderInfo;
-         var loader:Loader = loaderInfo.loader;            
-         var bmp:Bitmap = Bitmap(loader.content);
-         dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_RETRIEVED,0,"",bmp) );
+         var loader:Loader = loaderInfo.loader;     
+		 
+		   var bitmapData:BitmapData = new BitmapData(loaderInfo.width, loaderInfo.height, true, 0xFFFFFF);
+		   bitmapData.draw(loaderInfo.loader);
+		 
+		   var bmp:Bitmap = new Bitmap(bitmapData);
+		   dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_RETRIEVED,0,"",bmp) );
       }
       
       //======================================= MISCELLANEOUS FUNCTIONS =================================
       private function imageStatusUpdate(e:StatusEvent):void {
-         trace("ANE Image status update event occurred");
          if(e.code == ANEImageEvent.IMAGE_LOADED ){
-            trace("ANE Image loaded event occured. Image ID: "+e.level+". Dispatching.");
             var id:Number = Number(e.level);
             var file:String = findByID(id).name;
             dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_LOADED,id,file) );            
@@ -97,7 +145,6 @@ package ane.bbm {
          for( var i:int = 0; i<_imageList.length; i++ ){
             if( _imageList[i].name == img ){
                found = true;
-               trace("Image "+_imageList[i].name+" has previously been loaded");
                break;
             }
          }
@@ -109,7 +156,6 @@ package ane.bbm {
          for( var i:int = 0; i<_imageList.length; i++ ){
             if( _imageList[i].name == img ){
                found = _imageList[i];
-               trace("Found image "+img+" by name");
                break;
             }
          }

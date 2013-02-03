@@ -34,36 +34,27 @@ extern "C" {
 typedef enum {
    PROFILE_THREAD_INITIALIZING = 0,
    PROFILE_THREAD_STARTING,
-   WAITING_ON_PROFILE,
-   PROCESSING_PROFILE,
+   LOADING_PROFILE,
+   LOADED_PROFILE,
    PROFILE_THREAD_STOPPING,
    PROFILE_THREAD_STOPPED
 } ane_profile_thread_status_e;
+
+typedef enum {
+   START_LOADING_PROFILE,
+   PROFILE_CHANGED_RELOAD,
+} ane_profile_event_e;
 
 //======================================================================================//
 //          CUSTOM FUNCTIONS
 //======================================================================================//
 
 void* initProfileThread(void *data);
+static void notifyProfileChanged(const char *event);
 
 //======================================================================================//
 //                 STANDARD FUNCTIONS FROM bbmsp_profile.h QNX FILE
 //======================================================================================//
-
-/**
- * @brief Retrieve the user's BBM profile information.
- *
- * @details You can retrieve the user's profile information, for example,
- * display name, status, and personal message.
- *
- * @param profile A pointer to the user's BBM profile.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see bbmsp_profile_t, BBMSP_SUCCESS, BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_get_user_profile(bbmsp_profile_t* profile);
-FREObject bbm_ane_bbmsp_get_user_profile(FREContext ctx, void* functionData,
-                                         uint32_t argc, FREObject argv[]);
 
 /**
  * @brief Send a request to set the user's BBM status message.
@@ -117,33 +108,6 @@ FREObject bbm_ane_bbmsp_set_user_profile_personal_message(FREContext ctx, void* 
 //BBMSP_API bbmsp_result_t bbmsp_set_user_profile_display_picture(bbmsp_image_t* image);
 FREObject bbm_ane_bbmsp_set_user_profile_display_picture(FREContext ctx, void* functionData,
                                                          uint32_t argc, FREObject argv[]);
-
-/**
- * @brief Create a user profile.
- *
- * @details Creates a new user profile. When the user profile is no longer
- * required, call @c bbmsp_profile_destroy() to free up the associated memory.
- *
- * @param profile An updated pointer to the new profile.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see bbmsp_profile_destroy(), BBMSP_SUCCESS, BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_profile_create(bbmsp_profile_t** profile);
-FREObject bbm_ane_bbmsp_profile_create(FREContext ctx, void* functionData,
-                                       uint32_t argc, FREObject argv[]);
-
-/**
- * @brief Destroy a user profile.
- * @details Destroys a user profile and frees up the associated memory.
- * @param profile A pointer to the profile to destroy.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see BBMSP_SUCCESS, BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_profile_destroy(bbmsp_profile_t** profile);
-FREObject bbm_ane_bbmsp_profile_destroy(FREContext ctx, void* functionData,
-                                        uint32_t argc, FREObject argv[]);
 
 /**
  * @brief Retrieve the user's BBM display name.
@@ -277,17 +241,6 @@ FREObject bbm_ane_bbmsp_profile_get_handle(FREContext ctx, void* functionData,
 //                                                       size_t buffer_size);
 FREObject bbm_ane_bbmsp_profile_get_app_version(FREContext ctx, void* functionData,
                                                 uint32_t argc, FREObject argv[]);
-
-/*!@cond PRIVATE
- * @deprecated This method updates @c platform_version to 1 if @c
- * platform_version is a valid pointer and returns @c BBMSP_SUCCESS. Otherwise,
- * it returns @c BBMSP_FAILURE. Use @c BBMSP_VERSION to get the BBM Social
- * Platform version.
- * @see BBMSP_VERSION, BBMSP_SUCCESS, BBMSP_FAILURE
- */
-//BBMSP_API BBMSP_API_DEPRECATED bbmsp_result_t bbmsp_profile_get_platform_version(bbmsp_profile_t* profile,
-//                                                                                 int* platform_version);
-//!@endcond PRIVATE
 
 /**
  * @brief Retrieve the user's display picture.

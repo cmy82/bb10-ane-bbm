@@ -56,6 +56,8 @@ extern int ane_image_domain;
 extern int ane_image_channel_id;
 extern int ane_contact_domain;
 extern int ane_contact_channel_id;
+extern int ane_profile_domain;
+extern int ane_profile_channel_id;
 
 extern int runCount;
 
