@@ -45,7 +45,6 @@ FREObject bbm_ane_startRegistration(FREContext ctx, void* functionData, uint32_t
    strncpy(uuid,(char *)value,length);
 
    progress = REGISTRATION_STARTING;
-   cout << "Attempting to register with BBMSP [" << uuid << "]" << endl;
    bbmspProcessRegistration(bbmsp_get_access_code());
 
    return NULL;
@@ -61,11 +60,9 @@ void* initRegistrationThread(void *data){
 
    for(;;) {
       //Get next BPS event and block until one returns
-      cout << "Waiting on BPS event in BBMSP thread" << endl;
       bps_get_event(&bps_event, -1);
       //If no BPS event is returned (ex if init failed) then cancel the event query
       if (!bps_event) return NULL;
-      cout << "BPS event received in BBMSP thread" << endl;
 
       int eventDomain;
       int eventCode;
@@ -93,11 +90,9 @@ static void registrationEventComplete(bps_event_t *event){
 }
 
 static void registrationComplete(){
-   cout << "Registration done. Passing event back to main thread." << endl;
    bps_event_t *aneRegistrationEvent;
    bps_event_create(&aneRegistrationEvent, ane_master_domain, bbmStatus, NULL, &registrationEventComplete);
    bps_channel_push_event(ane_master_channel_id, aneRegistrationEvent);
-   cout << "Event passed back." << endl;
 }
 
 static void bbmspProcessRegistration(const bbmsp_access_error_codes_t status){
@@ -113,7 +108,6 @@ static void bbmspProcessRegistration(const bbmsp_access_error_codes_t status){
          if (bbmsp_is_access_allowed()) {
             progress = REGISTRATION_STOPPED;
             bbmStatus = ANE_REGISTERED;
-            cout << "Access granted" << endl;
             registrationComplete();
             return;
          }
@@ -121,7 +115,6 @@ static void bbmspProcessRegistration(const bbmsp_access_error_codes_t status){
 
          // Status is not yet known. Wait for an event that will deliver the status.
          if (status == BBMSP_ACCESS_UNKNOWN){
-            cout << "BBMSP access is unknown" << endl;
             //return;
          }
 
@@ -131,12 +124,10 @@ static void bbmspProcessRegistration(const bbmsp_access_error_codes_t status){
          // keep using the same UUID when you release a new version of your
          // application.
          // You can generate one here: http://www.guidgenerator.com/
-         cout << "Calling register for uuid: " << uuid << endl;
          if(bbmsp_register(uuid)) {
             // Registration started. The user will see a dialog informing them that
             // your application is connecting to BBM.
             progress = REGISTRATION_STARTED;
-            cout << "Call to register uuid was successful" << endl;
             return;
          }
          // Could not start registration. No dialogs were shown.

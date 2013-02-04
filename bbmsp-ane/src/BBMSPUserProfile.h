@@ -312,43 +312,6 @@ FREObject bbm_ane_bbmsp_profile_set_display_picture(FREContext ctx, void* functi
                                                     uint32_t argc, FREObject argv[]);
 
 /**
- * @brief Retrieve the BBM user profile that was changed.
- *
- * @details When a user's profile is changed, a
- * @c BBMSP_SP_EVENT_PROFILE_CHANGED event is triggered.
- *
- * @param event A pointer to the @c bbmsp event that was triggered when the user
- * profile was changed.
- * @param profile An updated pointer to the BBM user profile that was changed.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see bbmsp_event_category_t, bbmsp_event_type_t, BBMSP_SUCCESS, BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_event_profile_changed_get_profile(bbmsp_event_t* event,
-//                                                                 bbmsp_profile_t** profile);
-FREObject bbm_ane_bbmsp_event_profile_changed_get_profile(FREContext ctx, void* functionData,
-                                                          uint32_t argc, FREObject argv[]);
-
-/**
- * @brief Retrieve the field that was changed in the user's BBM profile.
- *
- * @details When a user's profile is changed, a
- * @c BBMSP_SP_EVENT_PROFILE_CHANGED event is triggered.
- *
- * @param event A pointer to the @c bbmsp event that was triggered when the
- * field was changed.
- * @param update_type An updated pointer identifying the field that was updated.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see bbmsp_event_t, bbmsp_presence_update_types_t, BBMSP_SUCCESS,
- * BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_event_profile_changed_get_presence_update_type( bbmsp_event_t* event,
-//                                                                               bbmsp_presence_update_types_t* update_type);
-FREObject bbm_ane_bbmsp_event_profile_changed_get_presence_update_type(FREContext ctx, void* functionData,
-                                                                       uint32_t argc, FREObject argv[]);
-
-/**
  * @brief Does not update the user's display name. Only updates the provided
  * @c profile instance.
  *

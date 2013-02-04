@@ -10,24 +10,16 @@ package ane.bbm {
       }
       
       public function startRegistration(uuid:String):void {
-         trace("[BBMSP.as] bbm_ane_startRegistration called with value "+uuid); 
-         _context.call( "bbm_ane_startRegistration", uuid );
-         trace("Returned from call to bbm_ane_startRegistration");         
+         _context.call( "bbm_ane_startRegistration", uuid );                  
       }
       
       public function getDomain():Number {
-         trace("[BBMSP.as] bbm_ane_bbmsp_get_domain"); 
          var out:Object = _context.call( "bbm_ane_bbmsp_get_domain", null );
-         trace("Returned from call to bbm_ane_bbmsp_get_domain");
-         trace( out.toString() );
          return Number(out);
       }
       
       public function getVersion():Number {
-         trace("[BBMSP.as] bbm_ane_bbmsp_get_version"); 
          var out:Object = _context.call( "bbm_ane_bbmsp_get_version", null );
-         trace("Returned from call to bbm_ane_bbmsp_get_version");
-         trace( out.toString() );
          return Number(out);
       }
    }

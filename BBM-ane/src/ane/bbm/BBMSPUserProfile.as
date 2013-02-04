@@ -72,6 +72,30 @@ package ane.bbm {
          this._context.call( "bbm_ane_bbmsp_set_user_profile_display_picture", id );            
       }
       
+      public function setStatusMessage(status:int,msg:String):void {
+         trace("Set profile status msg: "+msg);
+         if( msg == null ) msg = " ";
+         this._context.call( "bbm_ane_bbmsp_profile_set_status", status, msg, msg.length );
+      }
+      
+      public function setUserProfileStatus(status:int,msg:String):void {
+         trace("Set user status msg: "+msg);
+         if( msg == null ) msg = " ";
+         this._context.call( "bbm_ane_bbmsp_set_user_profile_status", status, msg, msg.length );
+      }
+      
+      public function setPersonalMessage(msg:String):void {
+         trace("Set profile personal msg: "+msg);
+         if( msg == null ) msg = " ";
+         this._context.call( "bbm_ane_bbmsp_profile_set_personal_message", msg, msg.length );
+      }
+      
+      public function setUserProfilePersonalMessage(msg:String):void {
+         trace("Set user personal msg: "+msg);
+         if( msg == null ) msg = " ";
+         this._context.call( "bbm_ane_bbmsp_set_user_profile_personal_message", msg, msg.length );
+      }
+      
       //======================================= MISCELLANEOUS FUNCTIONS =================================
       private function profileStatusUpdate(e:StatusEvent):void {
          if(e.code == ANEUserProfileEvent.PROFILE_LOADED ){

@@ -1,27 +1,37 @@
 err: config: Failed to open file (/etc/system/config/qnxair_variant.conf): No such file or directory	(tid:1)
 Request to receive BBMSP events successful for ANE thread [4]
-Waiting on BPS event in BBMSP thread
+Waiting on BPS event in ANE thread
 Waiting on BPS event in profile thread
-Waiting on BPS event in ANE thread
 BPS Event received in ANE thread
 Waiting on BPS event in ANE thread
 BPS Event received in ANE thread
 BBMSP event received in ANE thread
 Waiting on BPS event in ANE thread
-BPS event received in BBMSP thread
 BPS Event received in ANE thread
 BBMSP event received in ANE thread
 Waiting on BPS event in ANE thread
-Waiting on BPS event in BBMSP thread
-Attempting to register with BBMSP [99b1d456-46e6-4f75-aca0-dacb4b878927]
-Access granted
-Registration done. Passing event back to main thread.
-Event passed back.
 BPS Event received in ANE thread
 Custom event for registration status received in ANE thread
 BPS event received in profile thread
 Starting loading of profile
 Loaded user profile
 Waiting on BPS event in profile thread
-
-Process 48857267 (adl) terminated SIGSEGV code=1 fltno=11 ip=01f90110(/usr/lib/ldqnx.so.2@__free+0x9c) mapaddr=00030110. ref=00000001 bdslot=1
+About to call bbmsp_contact_list_get
+Called bbmsp_contact_list_get
+Waiting on contact list to be populated
+BPS Event received in ContactList thread
+Contact list event
+Contact list ready to be retrieved
+Retrieved 0 contacts
+checking length of message array
+length: 12
+msg: a
+checking length of message array
+length: 6
+msg: y
+BPS event received in profile thread
+Profile event changed code recieved
+Waiting on BPS event in profile thread
+BPS event received in profile thread
+Profile event changed code recieved
+Waiting on BPS event in profile thread

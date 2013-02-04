@@ -102,8 +102,23 @@ void* initProfileThread(void *data){
             //Only check for event passed to the registration domain
             if( eventDomain == ane_profile_domain ){
                eventCode = bps_event_get_code(bps_event);
-               if( eventCode == PROFILE_CHANGED_RELOAD )
+               if( eventCode == PROFILE_CHANGED_RELOAD ){
+                  cout << "Profile event changed code received" << endl;
+                  bps_event_payload_t *payload = bps_event_get_payload(bps_event);
+                  bbmsp_event_t       *bbmsp_event = (bbmsp_event_t*)(payload->data1);
+                  if( bbmsp_event != NULL ) cout << "BBMSP event retrieved from payload" << endl;
+
+                  //BBMSP_API bbmsp_result_t bbmsp_event_profile_changed_get_profile(bbmsp_event_t* event,
+                  //                                                                 bbmsp_profile_t** profile);
+                  //FREObject bbm_ane_bbmsp_event_profile_changed_get_profile(FREContext ctx, void* functionData,
+                  //                                        uint32_t argc, FREObject argv[]);
+
+                  //BBMSP_API bbmsp_result_t bbmsp_event_profile_changed_get_presence_update_type( bbmsp_event_t* event,
+                  //                                                                               bbmsp_presence_update_types_t* update_type);
+                  //FREObject bbm_ane_bbmsp_event_profile_changed_get_presence_update_type(FREContext ctx, void* functionData,
+                  //                                                     uint32_t argc, FREObject argv[]);
                   break;
+               }
 
             }
          }
@@ -133,18 +148,22 @@ static void notifyProfileChanged(const char *event){
 //                                                       const char* custom_status_message);
 FREObject bbm_ane_bbmsp_set_user_profile_status(FREContext ctx, void* functionData,
                                                 uint32_t argc, FREObject argv[]){
-   int status;
    bbmsp_result_t code;
-   const uint8_t * value;
-   uint length = strlen((char*)argv[1])+1;
+   const uint8_t  *value;
+   uint32_t       length;
+   int            status;
    bbmsp_presence_status_t t;
 
    FREGetObjectAsInt32(argv[0],&status);
+   cout << "checking length of status message array" << endl;
+   FREGetObjectAsUint32(argv[2],&length);
+   cout << "length: " << length << endl;
 
-   char *msg = (char*) malloc(length);
-   msg[length-1] = '\0';
+   char *msg = (char*) malloc(length+1);
+   msg[length] = '\0';
    FREGetObjectAsUTF8( argv[1], &length, &value );
    strncpy(msg,(char*)value,length);
+   cout << "msg: " << *msg << endl;
 
    if( status == 0 ){
       code = bbmsp_set_user_profile_status(BBMSP_PRESENCE_STATUS_AVAILABLE,msg);
@@ -160,13 +179,18 @@ FREObject bbm_ane_bbmsp_set_user_profile_status(FREContext ctx, void* functionDa
 //BBMSP_API bbmsp_result_t bbmsp_set_user_profile_personal_message(const char* personal_message);
 FREObject bbm_ane_bbmsp_set_user_profile_personal_message(FREContext ctx, void* functionData,
                                                           uint32_t argc, FREObject argv[]){
-   const uint8_t * value;
-   uint length = strlen((char*)argv[0])+1;
+   const uint8_t *value;
+   uint32_t      length;
 
-   char *msg = (char*) malloc(length);
-   msg[length-1] = '\0';
+   cout << "checking length of personal message array" << endl;
+   FREGetObjectAsUint32(argv[1],&length);
+   cout << "length: " << length << endl;
+
+   char *msg = (char*) malloc(length+1);
+   msg[length] = '\0';
    FREGetObjectAsUTF8( argv[0], &length, &value );
    strncpy(msg,(char *)value,length);
+   cout << "msg: " << *msg << endl;
 
    bbmsp_result_t code = bbmsp_set_user_profile_personal_message((const char*)msg);
    FREObject result;
@@ -308,15 +332,17 @@ FREObject bbm_ane_bbmsp_profile_get_display_picture(FREContext ctx, void* functi
 //                                                  const char* custom_status_message);
 FREObject bbm_ane_bbmsp_profile_set_status(FREContext ctx, void* functionData,
                                            uint32_t argc, FREObject argv[]){
-   int status;
    bbmsp_result_t code;
-   const uint8_t * value;
-   uint length = strlen((char*)argv[1])+1;
+   const uint8_t  *value;
+   uint32_t       length;
+   int            status;
    bbmsp_presence_status_t t;
-   FREGetObjectAsInt32(argv[0],&status);
 
-   char *msg = (char*) malloc(length);
-   msg[length-1] = '\0';
+   FREGetObjectAsInt32(argv[0],&status);
+   FREGetObjectAsUint32(argv[2],&length);
+
+   char *msg = (char*) malloc(length+1);
+   msg[length] = '\0';
    FREGetObjectAsUTF8( argv[1], &length, &value );
    strncpy(msg,(char*)value,length);
 
@@ -335,13 +361,16 @@ FREObject bbm_ane_bbmsp_profile_set_status(FREContext ctx, void* functionData,
 //                                                            const char* personal_message);
 FREObject bbm_ane_bbmsp_profile_set_personal_message(FREContext ctx, void* functionData,
                                                      uint32_t argc, FREObject argv[]){
-   const uint8_t * value;
-   uint length = strlen((char*)argv[0])+1;
+   const uint8_t *value;
+   uint32_t length;
 
-   char *msg = (char*) malloc(length);
-   msg[length-1] = '\0';
+   FREGetObjectAsUint32(argv[1],&length);
+
+   char *msg = (char*) malloc(length+1);
+   msg[length] = '\0';
    FREGetObjectAsUTF8( argv[0], &length, &value );
    strncpy(msg,(char *)value,length);
+   cout << "msg: " << *msg << endl;
 
    bbmsp_result_t code = bbmsp_profile_set_personal_message(userProfile,(const char*)msg);
    FREObject result;
@@ -362,43 +391,6 @@ FREObject bbm_ane_bbmsp_profile_set_display_picture(FREContext ctx, void* functi
    FRENewObjectFromUint32(code, &result);
    return result;
 }
-
-/**
- * @brief Retrieve the BBM user profile that was changed.
- *
- * @details When a user's profile is changed, a
- * @c BBMSP_SP_EVENT_PROFILE_CHANGED event is triggered.
- *
- * @param event A pointer to the @c bbmsp event that was triggered when the user
- * profile was changed.
- * @param profile An updated pointer to the BBM user profile that was changed.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see bbmsp_event_category_t, bbmsp_event_type_t, BBMSP_SUCCESS, BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_event_profile_changed_get_profile(bbmsp_event_t* event,
-//                                                                 bbmsp_profile_t** profile);
-FREObject bbm_ane_bbmsp_event_profile_changed_get_profile(FREContext ctx, void* functionData,
-                                                          uint32_t argc, FREObject argv[]);
-
-/**
- * @brief Retrieve the field that was changed in the user's BBM profile.
- *
- * @details When a user's profile is changed, a
- * @c BBMSP_SP_EVENT_PROFILE_CHANGED event is triggered.
- *
- * @param event A pointer to the @c bbmsp event that was triggered when the
- * field was changed.
- * @param update_type An updated pointer identifying the field that was updated.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see bbmsp_event_t, bbmsp_presence_update_types_t, BBMSP_SUCCESS,
- * BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_event_profile_changed_get_presence_update_type( bbmsp_event_t* event,
-//                                                                               bbmsp_presence_update_types_t* update_type);
-FREObject bbm_ane_bbmsp_event_profile_changed_get_presence_update_type(FREContext ctx, void* functionData,
-                                                                       uint32_t argc, FREObject argv[]);
 
 //BBMSP_API bbmsp_result_t bbmsp_profile_set_display_name(bbmsp_profile_t* profile,
 //                                                        const char* display_name);

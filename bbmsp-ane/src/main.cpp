@@ -272,9 +272,17 @@ static void* initAneThread(void *data){
 
               if( eventCategory == BBMSP_USER_PROFILE ){
                  if( eventType == BBMSP_SP_EVENT_PROFILE_CHANGED ){
-                    bps_event_t *aneProfileEvent;
+                    bps_event_t         *aneProfileEvent;
+                    bps_event_payload_t payload;
+
+                    bbmsp_event_t *copy;
+                    //copy = (bbmsp_event_t*)malloc(sizeof(*copy));
+                    //memcpy(copy,bbmspEvent,sizeof(*copy));
+
+                    payload.data1 = (uintptr_t)copy;
+
                     bps_event_create(&aneProfileEvent, ane_profile_domain,
-                                     PROFILE_CHANGED_RELOAD, NULL, &bpsEventComplete);
+                                     PROFILE_CHANGED_RELOAD, &payload, &bpsEventComplete);
                     bps_channel_push_event(ane_profile_channel_id, aneProfileEvent);
                  }
               }
@@ -417,6 +425,7 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                    "bbm_ane_bbmsp_profile_set_status",
                                    "bbm_ane_bbmsp_profile_set_personal_message",
                                    "bbm_ane_bbmsp_set_user_profile_personal_message",
+                                   "bbm_ane_bbmsp_set_user_profile_status",
                                    NULL };
 	FREFunction functionPtrs[] = { checkStatus,
 	                               bbm_ane_startRegistration,
@@ -443,6 +452,8 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                   bbm_ane_bbmsp_set_user_profile_display_picture,
                                   bbm_ane_bbmsp_profile_set_status,
                                   bbm_ane_bbmsp_profile_set_personal_message,
+                                  bbm_ane_bbmsp_set_user_profile_personal_message,
+                                  bbm_ane_bbmsp_set_user_profile_status,
                                   NULL };
 
 	// count number of functions

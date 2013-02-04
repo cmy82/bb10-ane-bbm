@@ -25,6 +25,8 @@
       var bbmExtension:BBMAne;   
       var usrSelected:Boolean = false;
       
+      var imgId:int;
+      
       private var uuid:String = "99b1d456-46e6-4f75-aca0-dacb4b878927"; //87-88-89-27
       
       public function BBM_ANE_Test() {
@@ -97,7 +99,7 @@
          testBtn.addEventListener(MouseEvent.CLICK,testUUID);
          regBtn.addEventListener(MouseEvent.CLICK,callRegistration);
          inviteBtn.addEventListener(MouseEvent.CLICK,callSendDownload);
-         imgHolder.addEventListener(MouseEvent.CLICK,callLoadImage);    
+         //imgHolder.addEventListener(MouseEvent.CLICK,callLoadImage);    
          ldProfBtn.addEventListener(MouseEvent.CLICK,displayProfile);
          
          addChild(testBtn);
@@ -143,24 +145,26 @@
       }
       
       public function displayProfile(e:MouseEvent):void {
-         var profile:ProfileCard = new ProfileCard(bbmExtension);
+         var profile:ProfileCard = new ProfileCard(bbmExtension,new Bitmap(Bitmap(imgHolder.getChildAt(0)).bitmapData.clone()));
          this.stage.addChild(profile);
       }
       
       private function retrieveImage(e:ANEImageEvent):void {
          var id:Number = e.id;
+         imgId = id;
          bbmExtension.bbmspImages.retrieveImage(id);
       }
       
       private function displayImage(e:ANEImageEvent):void {
          var pic:Bitmap = e.image;
          pic.bitmapData = ImageResizer.bilinearIterative(pic.bitmapData,225,250,ResizeMath.METHOD_PAN_AND_SCAN);
-         imgHolder.addChild(pic);
+         if( imgHolder.numChildren > 0 ) imgHolder.removeChildAt(0);
+         imgHolder.addChild( new Bitmap(pic.bitmapData.clone()) );
          
-         if( usrSelected ){
-            bbmExtension.bbmspUserProfile.setUserProfileDisplayPicture(e.id);
-            usrSelected = false;
-         }
+         //if( usrSelected ){
+         //   bbmExtension.bbmspUserProfile.setUserProfileDisplayPicture(e.id);
+         //   usrSelected = false;
+         //}
       }
       
       private function updateHandle(e:ANEUserProfileEvent):void {
@@ -173,33 +177,54 @@
 
 
 import ane.bbm.BBMAne;
+import ane.bbm.events.ANEImageEvent;
 
+import flash.display.Bitmap;
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 import flash.events.MouseEvent;
 import flash.events.TouchEvent;
 import flash.external.ExtensionContext;
+import flash.text.TextFormatAlign;
 
 import qnx.fuse.ui.buttons.LabelButton;
+import qnx.fuse.ui.buttons.SegmentedControl;
+import qnx.fuse.ui.buttons.ToggleSwitch;
 import qnx.fuse.ui.core.Container;
+import qnx.fuse.ui.skins.SkinAssets;
+import qnx.fuse.ui.text.Label;
+import qnx.fuse.ui.text.TextArea;
+import qnx.fuse.ui.text.TextFormat;
+import qnx.fuse.ui.text.TextInput;
 
 
 
 class ProfileCard extends Sprite {
    private var _bbm:BBMAne;
-   public function ProfileCard(bbm:BBMAne) {
+   private var img:Sprite;
+   private var _pic:Bitmap;
+   private var statMsg:TextArea;
+   private var persMsg:TextArea;
+   private var status:ToggleSwitch;
+   
+   public function ProfileCard(bbm:BBMAne,pic:Bitmap) {
       _bbm = bbm;
-      this.addEventListener(Event.ADDED_TO_STAGE,init);      
+      _pic = pic;
+      this.addEventListener(Event.ADDED_TO_STAGE,init);  
+      this.addEventListener(Event.REMOVED_FROM_STAGE,cleanup);
+      _bbm.bbmspImages.addEventListener(ANEImageEvent.IMAGE_RETRIEVED,displayImage);
    }
    
    public function init(e:Event):void {
       this.removeEventListener(Event.ADDED_TO_STAGE,init);
       
-      this.graphics.beginFill(0x000000,1.0);
+      this.graphics.beginFill(0x999999,1.0);
       this.graphics.drawRoundRect(0,0,stage.stageWidth,stage.stageHeight/2,30);
       this.graphics.endFill();
-      
+      this.graphics.beginFill(0xDCDCDC,1.0);
+      this.graphics.drawRoundRect(10,10,stage.stageWidth-20,(stage.stageHeight/2)-20,30);
+      this.graphics.endFill();
       
       var cls:LabelButton = new LabelButton();
       cls.label = "CLOSE";
@@ -211,17 +236,110 @@ class ProfileCard extends Sprite {
       addChild(cls);
       
       var profile:Container = new Container();
-      profile.height = this.height-120;
+      profile.height = this.height-125;
       profile.width = this.width-30;      
-      profile.y = 10;
+      profile.y = 15;
       profile.x = 15;
       addChild(profile);
       
-      this.y = stage.stageHeight/4;
+      img = new Sprite();
+      img.x = this.width - 255;
+      img.y = 0;
+      img.graphics.beginFill(0xAAAAAA,0.8);
+      img.graphics.drawRoundRect(0,0,225,250,20);
+      img.graphics.endFill();
+      img.addEventListener(MouseEvent.CLICK,callLoadImage);
+      img.addChild(_pic);
+      profile.addChild(img);
+      
+      var name:TextInput = new TextInput();
+      name.editable = true;
+      name.x = 0;
+      name.y = 0;
+      name.text = _bbm.bbmspUserProfile.getUserDisplayName();
+      name.prompt = "Display Name";
+      name.width = this.width - 265;
+      name.height = 80;
+      profile.addChild(name);
+                
+      status = new ToggleSwitch();
+      status.defaultLabel = "BUSY";
+      status.selectedLabel = "AVAILABLE";
+      status.x = 0;
+      status.y = 90;
+      status.width = this.width - 265;
+      status.height = 80;
+      profile.addChild(status);
+      if( _bbm.bbmspUserProfile.getUserStatus() != "BUSY" ) status.selected = true;
+      
+      var version:Label = new Label();
+      version.x = 0;
+      version.y = 180;
+      version.width = this.width-265;
+      version.height = 80;
+      version.text = "App Version: "+_bbm.bbmspUserProfile.getUserAppVersion();
+      var tf:TextFormat = new TextFormat();
+      tf.bold = true;
+      tf.align = TextFormatAlign.CENTER;
+      version.format = tf;
+      profile.addChild(version);
+      
+      statMsg = new TextArea();
+      statMsg.x = 0;
+      statMsg.y = 265;
+      statMsg.width = this.width - 30;
+      statMsg.height = 120;
+      statMsg.maxLines = 3;
+      statMsg.maxChars = 160;
+      statMsg.text = _bbm.bbmspUserProfile.getUserStatusMessage();
+      statMsg.prompt = "Status Message";
+      profile.addChild(statMsg);
+      
+      persMsg = new TextArea();
+      persMsg.x = 0;
+      persMsg.y = 395;
+      persMsg.width = this.width - 30;
+      persMsg.height = 120;
+      persMsg.maxLines = 3;
+      persMsg.maxChars = 160;
+      persMsg.text = _bbm.bbmspUserProfile.getUserPersonalMessage();
+      persMsg.prompt = "Personal Message";
+      profile.addChild(persMsg);
+      
+      this.y = stage.stageHeight/4;      
+   }
+   
+   private function cleanup(e:Event){
+      _bbm.bbmspImages.removeEventListener(ANEImageEvent.IMAGE_RETRIEVED,displayImage);   
    }
    
    private function closeProfile(e:MouseEvent):void {
+      if( _bbm.bbmspUserProfile.getUserPersonalMessage() != persMsg.text ){
+         _bbm.bbmspUserProfile.setUserProfilePersonalMessage( persMsg.text );
+      }
+      
+      var cStat:String = "BUSY";
+      if( status.selected ) cStat = "AVAILABLE";
+      if( (_bbm.bbmspUserProfile.getUserStatusMessage() != statMsg.text) ||
+          (_bbm.bbmspUserProfile.getUserStatus() != cStat) ){
+         trace(cStat);         
+         var code:int = 1;
+         if( status.selected ) code = 0;
+         _bbm.bbmspUserProfile.setUserProfileStatus( code, statMsg.text );
+      }
+      
       stage.removeChild(this);
+   }
+   
+   public function callLoadImage(e:MouseEvent):void {
+      _bbm.bbmspImages.loadImage();
+   }
+   
+   private function displayImage(e:ANEImageEvent):void {
+      var pic:Bitmap = e.image;
+      pic.bitmapData = ImageResizer.bilinearIterative(pic.bitmapData,225,250,ResizeMath.METHOD_PAN_AND_SCAN);
+      img.addChild( new Bitmap(pic.bitmapData.clone()) );      
+      _bbm.bbmspUserProfile.setUserProfileDisplayPicture(e.id);      
    }
 }
 

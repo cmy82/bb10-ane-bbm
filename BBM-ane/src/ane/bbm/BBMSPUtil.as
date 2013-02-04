@@ -1,5 +1,6 @@
 package ane.bbm {
    import ane.bbm.events.ANEImageEvent;
+   import ane.utils.images.JPGEncoder;
    
    import flash.display.Bitmap;
    import flash.display.BitmapData;
@@ -104,6 +105,24 @@ package ane.bbm {
             var image2:ImageTracker = findByName(imageFile.name);
             dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_LOADED,image2.id,imageFile.name) );            
          }
+         
+         //var loader:Loader = new Loader();
+         //loader.contentLoaderInfo.addEventListener(Event.COMPLETE,imageLoaded)
+         //loader.loadBytes(imageBytes);
+      }
+      
+      private function imageLoaded(e:Event):void {
+         var loaderInfo:LoaderInfo = e.target as LoaderInfo;
+         var loader:Loader = loaderInfo.loader;
+         var smallImg:Bitmap = Bitmap(loader.content);           
+         var jpg:JPGEncoder = new JPGEncoder(70);
+         var ba:ByteArray  = jpg.encode(smallImg.bitmapData);
+         
+         trace("URL from loader object: "+loaderInfo.url);
+         var result:Object = 
+            this._context.call( "bbm_ane_bbmsp_image_create", "JPG", ba.length, ba );
+         var image:ImageTracker = new ImageTracker(loaderInfo.url,Number(result));
+         _imageList.push(image);
       }
       
       //=============================== RETRIEVING FUNCTIONS ====================================
@@ -115,11 +134,11 @@ package ane.bbm {
 		   this._context.call( "bbm_ane_bbmsp_image_get_data", id, imgData );
          
          var loader:Loader = new Loader();
-         loader.contentLoaderInfo.addEventListener(Event.COMPLETE,imageLoaded)
+         loader.contentLoaderInfo.addEventListener(Event.COMPLETE,imageRetrieved)
          loader.loadBytes(imgData);         
       }
                                
-      private function imageLoaded(e:Event):void {
+      private function imageRetrieved(e:Event):void {
          var loaderInfo:LoaderInfo = e.target as LoaderInfo;
          var loader:Loader = loaderInfo.loader;     
 		 
