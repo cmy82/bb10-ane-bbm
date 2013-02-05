@@ -37,6 +37,8 @@ typedef enum {
 
 void* initImageThread(void *data);
 static void notifyImageComplete(int id);
+FREObject bbm_ane_image_exists(FREContext ctx, void* functionData,
+                                     uint32_t argc, FREObject argv[]);
 
 //======================================================================================//
 //                   STANDARD FUNCTIONS FROM bbmsp_util.h QNX FILE

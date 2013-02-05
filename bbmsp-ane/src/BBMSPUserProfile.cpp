@@ -29,6 +29,8 @@ pthread_mutex_t             profileMutex;
 int ane_profile_domain     = -1;
 int ane_profile_channel_id = -1;
 int userProfilePictureID   = -1;
+int userProfilePicChanged  =  1;
+int userChangedPic         =  0;
 
 bbmsp_profile_t *userProfile;
 bbmsp_image_t   *profileImage;
@@ -84,6 +86,13 @@ void* initProfileThread(void *data){
             break;
 
          case LOADING_PROFILE:
+            bbmsp_profile_destroy(&userProfile);
+            bbmsp_profile_create(&userProfile);
+            if( bbmsp_get_user_profile(userProfile) != BBMSP_FAILURE ){
+               profileThreadStatus = LOADED_PROFILE;
+               notifyProfileChanged("ANEProfileUpdated");
+               cout << "Reloaded user profile" << endl;
+            }
             break;
 
          case LOADED_PROFILE:
@@ -105,18 +114,20 @@ void* initProfileThread(void *data){
                if( eventCode == PROFILE_CHANGED_RELOAD ){
                   cout << "Profile event changed code received" << endl;
                   bps_event_payload_t *payload = bps_event_get_payload(bps_event);
-                  bbmsp_event_t       *bbmsp_event = (bbmsp_event_t*)(payload->data1);
-                  if( bbmsp_event != NULL ) cout << "BBMSP event retrieved from payload" << endl;
+                  bbmsp_profile_t *updated = (bbmsp_profile_t*)payload->data1;
+                  if( updated != NULL ) cout << "Profile retrieved from event" << endl;
+                  bbmsp_presence_update_types_t *presence = (bbmsp_presence_update_types_t*)payload->data2;
+                  if( presence != NULL ) cout << "Profile presence status retrieved from event" << endl;
 
-                  //BBMSP_API bbmsp_result_t bbmsp_event_profile_changed_get_profile(bbmsp_event_t* event,
-                  //                                                                 bbmsp_profile_t** profile);
-                  //FREObject bbm_ane_bbmsp_event_profile_changed_get_profile(FREContext ctx, void* functionData,
-                  //                                        uint32_t argc, FREObject argv[]);
+                  //If the user display picture changed then need to reload and insert in image map
+                  if( (*presence & BBMSP_DISPLAY_PICTURE) == BBMSP_DISPLAY_PICTURE ){
+                     cout << "User profile picture was changed, reload" << endl;
+                     pthread_mutex_lock(&profileMutex);
+                     userProfilePicChanged = 1;
+                     pthread_mutex_unlock(&profileMutex);
+                  }
 
-                  //BBMSP_API bbmsp_result_t bbmsp_event_profile_changed_get_presence_update_type( bbmsp_event_t* event,
-                  //                                                                               bbmsp_presence_update_types_t* update_type);
-                  //FREObject bbm_ane_bbmsp_event_profile_changed_get_presence_update_type(FREContext ctx, void* functionData,
-                  //                                                     uint32_t argc, FREObject argv[]);
+                  profileThreadStatus = LOADING_PROFILE;
                   break;
                }
 
@@ -208,6 +219,10 @@ FREObject bbm_ane_bbmsp_set_user_profile_display_picture(FREContext ctx, void* f
    bbmsp_result_t code = bbmsp_set_user_profile_display_picture(image);
    FREObject result;
    FRENewObjectFromUint32(code, &result);
+
+   userChangedPic = 1; //Set that user changed pic so not reloaded into image map
+   cout << "profile picture was set by user - not needed to be retrieved" << endl;
+
    return result;
 }
 
@@ -316,11 +331,37 @@ FREObject bbm_ane_bbmsp_profile_get_app_version(FREContext ctx, void* functionDa
 //                                                           bbmsp_image_t* display_picture);
 FREObject bbm_ane_bbmsp_profile_get_display_picture(FREContext ctx, void* functionData,
                                                     uint32_t argc, FREObject argv[]){
+   pthread_mutex_lock(&profileMutex);
+   cout << "getting user profile picture " << endl;
+   cout << "did user change picture: " << userChangedPic << endl;
+   cout << "was profile pictured changed: " << userProfilePicChanged << endl;
+   if( (userProfilePicChanged == 0) ){
+      cout << "profile pic not changed - returning stored profile picture id: " << userProfilePictureID << endl;
+      userChangedPic = 0;
+      //return userProfilePictureID;
+      FREObject result;
+      FRENewObjectFromInt32(userProfilePictureID, &result);
+      return result;
+   } else if( userChangedPic != 0 ){
+      cout << "user changed profile pic - returning stored profile picture id: " << userProfilePictureID << endl;
+      userChangedPic = 0;
+      //return userProfilePictureID;
+      FREObject result;
+      FRENewObjectFromInt32(userProfilePictureID, &result);
+      return result;
+   }
+   pthread_mutex_unlock(&profileMutex);
+
    bbmsp_image_t *usrPicture;
    bbmsp_image_create_empty(&usrPicture);
    bbmsp_profile_get_display_picture(userProfile,usrPicture);
    userProfilePictureID = rand();
    bbmsp_image_map->insert( std::pair<int,bbmsp_image_t*>(userProfilePictureID,usrPicture) );
+
+   pthread_mutex_lock(&profileMutex);
+   userProfilePicChanged = 0;
+   userChangedPic        = 0;
+   pthread_mutex_unlock(&profileMutex);
 
    FREObject result;
    FRENewObjectFromInt32(userProfilePictureID, &result);

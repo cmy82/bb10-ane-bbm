@@ -98,8 +98,10 @@ package ane.bbm {
       
       //======================================= MISCELLANEOUS FUNCTIONS =================================
       private function profileStatusUpdate(e:StatusEvent):void {
-         if(e.code == ANEUserProfileEvent.PROFILE_LOADED ){
+         if(e.code == ANEUserProfileEvent.PROFILE_LOADED){
             dispatchEvent( new ANEUserProfileEvent(ANEUserProfileEvent.PROFILE_LOADED) );            
+         } else if(e.code == ANEUserProfileEvent.PROFILE_UPDATED){
+            dispatchEvent( new ANEUserProfileEvent(ANEUserProfileEvent.PROFILE_UPDATED) );
          }
       }
    }

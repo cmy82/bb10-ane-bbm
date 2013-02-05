@@ -75,6 +75,13 @@ package ane.bbm {
 		   return -1;
 	   }
 	  
+      
+      public function imageExists(id:Number):Boolean {
+         var result:Object = this._context.call( "bbm_ane_image_exists", id );
+         if( Number(result) == 0 ) return false;
+         return true;
+      }
+      
       //================================== LOADING FUNCTIONS ====================================
       public function loadImage():void {
          var dir:File = File.userDirectory.resolvePath( 'shared/photos' );

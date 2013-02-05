@@ -123,6 +123,7 @@
             bbmExtension.bbmspImages.addEventListener(ANEImageEvent.IMAGE_LOADED,retrieveImage);
             bbmExtension.bbmspImages.addEventListener(ANEImageEvent.IMAGE_RETRIEVED,displayImage);
             bbmExtension.bbmspUserProfile.addEventListener(ANEUserProfileEvent.PROFILE_LOADED,updateHandle);
+            bbmExtension.bbmspUserProfile.addEventListener(ANEUserProfileEvent.PROFILE_UPDATED,updateHandle);
          }
       }
       

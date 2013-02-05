@@ -122,6 +122,20 @@ static void notifyImageComplete(int id){
    FREDispatchStatusEventAsync(currentContext, (const uint8_t*)eventName, (const uint8_t*)imgID);
 }
 
+FREObject bbm_ane_image_exists(FREContext ctx, void* functionData,
+                                     uint32_t argc, FREObject argv[]){
+   int imageID;
+   FREGetObjectAsInt32(argv[0],&imageID);
+   bbmsp_image_t *image = (bbmsp_image_map->find(imageID))->second;
+
+   int code = 0;
+   if( image != NULL ) code = 1;
+
+   FREObject result;
+   FRENewObjectFromUint32(code, &result);
+   return result;
+}
+
 //======================================================================================//
 //                   STANDARD FUNCTIONS FROM bbmsp_util.h QNX FILE
 //======================================================================================//
