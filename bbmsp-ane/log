@@ -1,6 +1,7 @@
 err: config: Failed to open file (/etc/system/config/qnxair_variant.conf): No such file or directory	(tid:1)
 Request to receive BBMSP events successful for ANE thread [4]
 Waiting on BPS event in profile thread
+Waiting on BPS event in profile box thread
 Waiting on BPS event in ANE thread
 BPS Event received in ANE thread
 Waiting on BPS event in ANE thread
@@ -10,6 +11,19 @@ Waiting on BPS event in ANE thread
 BPS Event received in ANE thread
 BBMSP event received in ANE thread
 Waiting on BPS event in ANE thread
+BPS Event received in ANE thread
+Custom event for registration status received in ANE thread
+BPS event received in profile thread
+BPS event received in profile box thread
+Starting loading of profile
+Starting loading of profile box
+Loaded user profile
+Waiting on BPS event in profile thread
+Loaded user profile box
+Waiting on BPS event in profile box thread
+getting user profile picture 
+did user change picture: 0
+was profile pictured changed: 1
 About to call bbmsp_contact_list_get
 Called bbmsp_contact_list_get
 Waiting on contact list to be populated
@@ -17,25 +31,3 @@ BPS Event received in ContactList thread
 Contact list event
 Contact list ready to be retrieved
 Retrieved 0 contacts
-BPS Event received in ANE thread
-Custom event for registration status received in ANE thread
-BPS event received in profile thread
-Starting loading of profile
-Loaded user profile
-Waiting on BPS event in profile thread
-getting user profile picture 
-did user change picture: 0
-was profile pictured changed: 1
-checking length of status message array
-length: 9
-msg: g
-============BBMSP Profile Changed Event Received===========
-BPS event received in profile thread
-Profile event changed code received
-Profile retrieved from event
-Profile presence status retrieved from event
-Reloaded user profile
-Waiting on BPS event in profile thread
-getting user profile picture 
-did user change picture: 0
-was profile pictured changed: 0

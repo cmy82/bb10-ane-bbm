@@ -1,16 +1,14 @@
 /*
- * BBMSPUserProfileBox.h
+ * BBMSPProfile.cpp
  *
- *  Created on: Jan 19, 2013
- *      Author: HU77
+ *  Created on: Jan 31, 2013
+ *      Author: CHRIS
  */
 
 
-#include "FlashRuntimeExtensions.h"
 
-
-#ifndef BBMANE_BBMSPUSERPROFILEBOX_H_
-#define BBMANE_BBMSPUSERPROFILEBOX_H_
+#include "Globals.h"
+#include <iostream>
 
 
 #ifdef __cplusplus
@@ -18,51 +16,130 @@ extern "C" {
 #endif
 
 
+using namespace std;
+
 
 //======================================================================================//
-//          GLOBAL VARIABLES/DEFINITIONS
+//          INITIALIZE NEEDED GLOBAL VARIABLES
 //======================================================================================//
 
-typedef enum {
-   PROFILE_BOX_THREAD_INIT = 0,
-   PBOX_THREAD_ACCESS_PEND,
-   PBOX_THREAD_STARTING,
-   PROFILE_BOX_LOADED,
-   PBOX_THREAD_STOPPING,
-   PBOX_THREAD_STOPPED
-} ane_profile_box_thread_status_e;
+ane_profile_box_thread_status_e profileBoxThreadStatus = PROFILE_BOX_THREAD_INIT;
+pthread_mutex_t                 profileBoxMutex;
 
-typedef enum {
-   START_LOADING_PROFILE_BOX,
-   PROFILE_BOX_CHANGED_ADD,
-   PROFILE_BOX_CHANGED_DEL,
-   PROFILE_BOX_CHANGED_ICN,
-} ane_profile_box_event_e;
+int ane_profile_box_domain     = -1;
+int ane_profile_box_channel_id = -1;
+
+//int userProfilePicChanged  =  1;
+//int userChangedPic         =  0;
+
+bbmsp_user_profile_box_item_list_t *profileBoxList;
+bbmsp_user_profile_box_icon_t      *profileIcon;
+bbmsp_user_profile_box_item_t      *profileItem;
 
 //======================================================================================//
 //          CUSTOM FUNCTIONS
 //======================================================================================//
 
-void* initProfileBoxThread(void *data);
-static void notifyProfileBoxChanged();
+void* initProfileBoxThread(void *data){
+   bps_initialize();
+   ane_profile_box_domain = bps_register_domain();
+   ane_profile_box_channel_id = bps_channel_get_active();
+
+   bps_event_t *bps_event;
+
+   for(;;) {
+      switch(profileBoxThreadStatus){
+         case PROFILE_BOX_THREAD_INIT:
+         {
+            //Get next BPS event and block until one returns
+            cout << "Waiting on BPS event in profile box thread" << endl;
+            bps_get_event(&bps_event, -1);
+            //If no BPS event is returned (ex if init failed) then cancel the event query
+            if (!bps_event) return NULL;
+            cout << "BPS event received in profile box thread" << endl;
+
+            int eventDomain;
+            int eventCode;
+
+            eventDomain = bps_event_get_domain(bps_event);
+            if( eventDomain == ane_profile_box_domain ){
+               eventCode = bps_event_get_code(bps_event);
+               if( eventCode == START_LOADING_PROFILE_BOX ){
+                  //profileThreadStatus = PROFILE_THREAD_STARTING;
+                  profileBoxThreadStatus = PBOX_THREAD_ACCESS_PEND;
+                  cout << "Starting loading of profile box" << endl;
+               }
+            }
+         }
+            break;
+
+         case PBOX_THREAD_ACCESS_PEND:
+            if( bbmsp_can_show_profile_box() )
+               profileBoxThreadStatus = PBOX_THREAD_STARTING;
+            else
+               sleep(60);
+            break;
+
+         case PBOX_THREAD_STARTING:
+            if( profileBoxList == NULL )
+               bbmsp_user_profile_box_item_list_create(&profileBoxList);
+            else {
+               bbmsp_user_profile_box_item_list_destroy(&profileBoxList);
+               bbmsp_user_profile_box_item_list_create(&profileBoxList);
+            }
+
+            if( bbmsp_user_profile_box_get_items(profileBoxList) != BBMSP_FAILURE ){
+               profileBoxThreadStatus = PROFILE_BOX_LOADED;
+               //notifyProfileChanged("ANEProfileLoaded");
+               cout << "Loaded user profile box" << endl;
+            } else
+               sleep(30);
+            break;
+
+         case PROFILE_BOX_LOADED:
+         {
+            //Get next BPS event and block until one returns
+            cout << "Waiting on BPS event in profile box thread" << endl;
+            bps_get_event(&bps_event, -1);
+            //If no BPS event is returned (ex if init failed) then cancel the event query
+            if (!bps_event) return NULL;
+            cout << "BPS event received in profile box thread" << endl;
+
+            int eventDomain;
+            int eventCode;
+
+            eventDomain = bps_event_get_domain(bps_event);
+            //Only check for event passed to the profile box domain
+            if( eventDomain == ane_profile_box_domain ){
+               eventCode = bps_event_get_code(bps_event);
+               //if( eventCode == PROFILE_CHANGED_RELOAD ){
+               //
+               //   break;
+               //}
+            }
+         }
+            break;
+
+         case PBOX_THREAD_STOPPING:
+            bbmsp_user_profile_box_item_list_destroy(&profileBoxList);
+            break;
+
+         case PBOX_THREAD_STOPPED:
+            break;
+      }
+   }
+
+   return NULL;
+}
+
+static void notifyProfileBoxChanged(){
+   //const char *lvl = "";
+   //FREDispatchStatusEventAsync(currentContext, (const uint8_t*)event, (const uint8_t*)lvl);
+}
 
 //======================================================================================//
-//            STANDARD FUNCTIONS FROM bbmsp_user_profile_box.h QNX FILE
+//             STANDARD FUNCTIONS FROM bbmsp_user_profile_box.h QNX FILE
 //======================================================================================//
-
-/**
- * @brief Destroy a profile box item.
- * @details Destroys this profile box item and frees up the associated memory.
- * Does not change the user's BBM profile box.
- *
- * @param item A pointer to the item in the profile box to destroy.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see BBMSP_SUCCESS, BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_user_profile_box_item_destroy(bbmsp_user_profile_box_item_t** item);
-FREObject bbm_ane_bbmsp_user_profile_box_item_destroy(FREContext ctx, void* functionData,
-                                                      uint32_t argc, FREObject argv[]);
 
 /**
  * @brief Create a copy of a profile box item.
@@ -284,7 +361,12 @@ FREObject bbm_ane_bbmsp_user_profile_box_itemlist_remove_at(FREContext ctx, void
  */
 //BBMSP_API bbmsp_result_t bbmsp_user_profile_box_remove_item(const char* itemid);
 FREObject bbm_ane_bbmsp_user_profile_box_remove_item(FREContext ctx, void* functionData,
-                                                     uint32_t argc, FREObject argv[]);
+                                                     uint32_t argc, FREObject argv[]){
+   bbmsp_result_t code = (bbmsp_result_t)0; //bbmsp_user_profile_box_remove_item();
+   FREObject result;
+   FRENewObjectFromInt32(code, &result);
+   return result;
+}
 
 /**
  * @brief Remove all items in the profile box from the user's BlackBerry device.
@@ -297,7 +379,12 @@ FREObject bbm_ane_bbmsp_user_profile_box_remove_item(FREContext ctx, void* funct
  */
 //BBMSP_API bbmsp_result_t bbmsp_user_profile_box_remove_all_items(void);
 FREObject bbm_ane_bbmsp_user_profile_box_remove_all_items(FREContext ctx, void* functionData,
-                                                           uint32_t argc, FREObject argv[]);
+                                                           uint32_t argc, FREObject argv[]){
+   bbmsp_result_t code = bbmsp_user_profile_box_remove_all_items();
+   FREObject result;
+   FRENewObjectFromInt32(code, &result);
+   return result;
+}
 
 /**
  * @brief Register an image with the BBM Social Platform for use with profile
@@ -379,9 +466,8 @@ FREObject bbm_ane_bbmsp_event_user_profile_box_icon_retrieved_get_icon_image(FRE
 
 
 
+
 #ifdef __cplusplus
 }
 #endif
 
-
-#endif /* BBMSPUSERPROFILEBOX_H_ */

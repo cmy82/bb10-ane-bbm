@@ -24,6 +24,7 @@
 #include <bbmsp/bbmsp_contactlist.h>
 #include <bbmsp/bbmsp_userprofile.h>
 #include <bbmsp/bbmsp_presence.h>
+#include <bbmsp/bbmsp_user_profile_box.h>
 
 #include <pthread.h>
 #include <unistd.h>
@@ -36,6 +37,7 @@
 #include "BBMSPMessaging.h"
 #include "BBMSPContactlist.h"
 #include "BBMSPUserProfile.h"
+#include "BBMSPUserProfileBox.h"
 
 
 #ifndef BBMANE_GLOBALS_H_
@@ -58,14 +60,14 @@ extern int ane_contact_domain;
 extern int ane_contact_channel_id;
 extern int ane_profile_domain;
 extern int ane_profile_channel_id;
+extern int ane_profile_box_domain;
+extern int ane_profile_box_channel_id;
 
 extern int runCount;
 
 extern std::map<int,bbmsp_image_t *>                      *bbmsp_image_map;
 extern std::map<int,bbmsp_contact_t *>                    *bbmsp_contact_map;
 //extern std::map<int,bbmsp_user_profile_box_item_t *>      bbmsp_profile_item_map;
-//extern std::map<int,bbmsp_user_profile_box_icon_t *>      bbmsp_profile_icon_map;
-//extern std::map<int,bbmsp_user_profile_box_item_list_t *> bbmsp_profile_item_list_map;
 
 typedef enum {
    ANE_PENDING_REGISTRATION = 0,
@@ -73,12 +75,14 @@ typedef enum {
    ANE_REGISTRATION_FAILED
 } ane_bbmsp_status_e;
 
-extern ane_bbmsp_status_e          bbmStatus;
-extern ane_image_thread_status_e   imageThreadStatus;
-extern ane_contact_thread_status_e contactThreadStatus;
-extern ane_profile_thread_status_e profileThreadStatus;
+extern ane_bbmsp_status_e              bbmStatus;
+extern ane_image_thread_status_e       imageThreadStatus;
+extern ane_contact_thread_status_e     contactThreadStatus;
+extern ane_profile_thread_status_e     profileThreadStatus;
+extern ane_profile_box_thread_status_e profileBoxThreadStatus;;
 
 extern FREContext currentContext;
+
 
 
 #ifdef __cplusplus

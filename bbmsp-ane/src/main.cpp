@@ -189,6 +189,7 @@ static void* initAneThread(void *data){
               pthread_create(NULL, NULL, initImageThread, NULL);
               pthread_create(NULL, NULL, initContactThread, NULL);
               pthread_create(NULL, NULL, initProfileThread, NULL);
+              pthread_create(NULL, NULL, initProfileBoxThread, NULL);
 
               aneThreadState = STARTING;
               break;
@@ -237,10 +238,17 @@ static void* initAneThread(void *data){
                  //Check to see which code was passed
                  switch(eventCode){
                     case ANE_REGISTERED:
+                         //Once registered load the profile
                          bps_event_t *aneProfileEvent;
                          bps_event_create(&aneProfileEvent, ane_profile_domain,
                                           START_LOADING_PROFILE, NULL, &bpsEventComplete);
                          bps_channel_push_event(ane_profile_channel_id, aneProfileEvent);
+
+                         //Once registered load the profile box
+                         bps_event_t *aneProfileBoxEvent;
+                         bps_event_create(&aneProfileBoxEvent, ane_profile_box_domain,
+                                          START_LOADING_PROFILE_BOX, NULL, &bpsEventComplete);
+                         bps_channel_push_event(ane_profile_box_channel_id, aneProfileBoxEvent);
 
                          aneThreadState = STARTED;
                          break;
@@ -293,7 +301,62 @@ static void* initAneThread(void *data){
               }
 
               if( eventCategory == BBMSP_USER_PROFILE_BOX ){
+                 if( eventType == BBMSP_SP_EVENT_USER_PROFILE_BOX_ITEM_ADDED ){
+                    cout << "============BBMSP Profile Box Item Added Event Received===========" << endl;
+                    bps_event_t         *aneProfileBoxEvent;
+                    bps_event_payload_t payload;
 
+                    bbmsp_user_profile_box_item_t *added;
+                    bbmsp_user_profile_box_item_create(&added);
+                    bbmsp_event_user_profile_box_item_added_get_item(bbmspEvent,added);
+
+
+
+                    payload.data1 = (uintptr_t)added;
+                    //payload.data2 = (uintptr_t)(&presence);
+
+                    bps_event_create(&aneProfileBoxEvent, ane_profile_box_domain,
+                                     PROFILE_BOX_CHANGED_ADD, &payload, &bpsEventComplete);
+                    bps_channel_push_event(ane_profile_box_channel_id, aneProfileBoxEvent);
+                 }
+
+                 if( eventType == BBMSP_SP_EVENT_USER_PROFILE_BOX_ITEM_REMOVED ){
+                    cout << "============BBMSP Profile Box Item Removed Event Received===========" << endl;
+                    bps_event_t         *aneProfileBoxEvent;
+                    bps_event_payload_t payload;
+
+                    bbmsp_user_profile_box_item_t *removed;
+                    bbmsp_user_profile_box_item_create(&removed);
+                    bbmsp_event_user_profile_box_item_removed_get_item(bbmspEvent,removed);
+
+
+
+                    payload.data1 = (uintptr_t)removed;
+                    //payload.data2 = (uintptr_t)(&presence);
+
+                    bps_event_create(&aneProfileBoxEvent, ane_profile_box_domain,
+                                     PROFILE_BOX_CHANGED_DEL, &payload, &bpsEventComplete);
+                    bps_channel_push_event(ane_profile_box_channel_id, aneProfileBoxEvent);
+                 }
+
+                 if( eventType == BBMSP_SP_EVENT_USER_PROFILE_BOX_ICON_ADDED ){
+                    cout << "============BBMSP Profile Box Item Icon Event Received===========" << endl;
+                    bps_event_t         *aneProfileBoxEvent;
+                    bps_event_payload_t payload;
+
+                    int32_t iconID;
+
+                    bbmsp_event_user_profile_box_icon_added_get_icon_id(bbmspEvent,&iconID);
+
+
+
+                    payload.data1 = (uintptr_t)iconID;
+                    //payload.data2 = (uintptr_t)(&presence);
+
+                    bps_event_create(&aneProfileBoxEvent, ane_profile_box_domain,
+                                     PROFILE_BOX_CHANGED_ICN, &payload, &bpsEventComplete);
+                    bps_channel_push_event(ane_profile_box_channel_id, aneProfileBoxEvent);
+                 }
               }
 
               if( eventCategory == BBMSP_CONTACT_LIST ){

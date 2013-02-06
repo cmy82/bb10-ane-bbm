@@ -82,7 +82,8 @@ void* initProfileThread(void *data){
                profileThreadStatus = LOADED_PROFILE;
                notifyProfileChanged("ANEProfileLoaded");
                cout << "Loaded user profile" << endl;
-            }
+            } else
+               sleep(30);
             break;
 
          case LOADING_PROFILE:
