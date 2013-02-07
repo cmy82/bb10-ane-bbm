@@ -197,7 +197,6 @@ void* initImageThread(void *data){
 static void notifyImageComplete(int id){
    const char *eventName = "ANEImageLoaded";
    char imgID[15];
-   for( int i=0; i<15; ++i ) imgID[i] = '\0';
    itoa(id,imgID,10);
    FREDispatchStatusEventAsync(currentContext, (const uint8_t*)eventName, (const uint8_t*)imgID);
 }

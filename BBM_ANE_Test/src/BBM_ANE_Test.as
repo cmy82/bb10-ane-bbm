@@ -97,7 +97,13 @@
          ldProfBtn.x = inviteBtn.x + 300;
          ldProfBtn.y = inviteBtn.y;         
          
-         testBtn.addEventListener(MouseEvent.CLICK,testUUID);
+         var ldProfBxItmBtn:LabelButton = new LabelButton();
+         ldProfBxItmBtn.label = "Load Profile Box Item";
+         ldProfBxItmBtn.width = 450;
+         ldProfBxItmBtn.x = (stage.stageWidth - 450) / 2;
+         ldProfBxItmBtn.y = inviteBtn.y+125;
+         
+         //testBtn.addEventListener(MouseEvent.CLICK,testUUID);
          regBtn.addEventListener(MouseEvent.CLICK,callRegistration);
          inviteBtn.addEventListener(MouseEvent.CLICK,callSendDownload);
          //imgHolder.addEventListener(MouseEvent.CLICK,callLoadImage);    
@@ -110,6 +116,7 @@
          addChild(ldProfBtn);
          addChild(imgHolder);
          addChild(tagHolder);
+         addChild(ldProfBxItmBtn);
          
          stage.nativeWindow.visible = true;
          NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;

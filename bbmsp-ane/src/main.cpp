@@ -336,7 +336,7 @@ static void* initAneThread(void *data){
                  }
 
                  if( eventType == BBMSP_SP_EVENT_USER_PROFILE_BOX_ICON_ADDED ){
-                    cout << "============BBMSP Profile Box Item Icon Event Received===========" << endl;
+                    cout << "============BBMSP Profile Box Item Icon Added Event Received===========" << endl;
                     bps_event_t         *aneProfileBoxEvent;
                     bps_event_payload_t payload;
 
@@ -346,12 +346,26 @@ static void* initAneThread(void *data){
                     payload.data1 = (uintptr_t)iconID;
 
                     bps_event_create(&aneProfileBoxEvent, ane_profile_box_domain,
-                                     PROFILE_BOX_CHANGED_ICN, &payload, &bpsEventComplete);
+                                     PROFILE_BOX_CHANGED_ICN_ADD, &payload, &bpsEventComplete);
                     bps_channel_push_event(ane_profile_box_channel_id, aneProfileBoxEvent);
                  }
 
                  if( eventType == BBMSP_SP_EVENT_USER_PROFILE_BOX_ICON_RETRIEVED ){
+                    cout << "============BBMSP Profile Box Item Icon Added Event Received===========" << endl;
+                    bps_event_t         *aneProfileBoxEvent;
+                    bps_event_payload_t payload;
+                    bbmsp_image_t       *icon;
+                    int32_t             iconID;
 
+                    bbmsp_event_user_profile_box_icon_added_get_icon_id(bbmspEvent,&iconID);
+                    bbmsp_event_user_profile_box_icon_retrieved_get_icon_image(bbmspEvent,&icon);
+
+                    payload.data1 = (uintptr_t)iconID;
+                    payload.data2 = (uintptr_t)icon;
+
+                    bps_event_create(&aneProfileBoxEvent, ane_profile_box_domain,
+                                     PROFILE_BOX_CHANGED_ICN_RET, &payload, &bpsEventComplete);
+                    bps_channel_push_event(ane_profile_box_channel_id, aneProfileBoxEvent);
                  }
               }
 

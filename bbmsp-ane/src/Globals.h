@@ -65,9 +65,9 @@ extern int ane_profile_box_channel_id;
 
 extern int runCount;
 
-extern std::map<int,ane_image_s*>                        *ane_image_map;
-extern std::map<int,bbmsp_contact_t*>                    *bbmsp_contact_map;
-//extern std::map<int,bbmsp_user_profile_box_item_t *>      bbmsp_profile_item_map;
+extern std::map<int,ane_image_s*>                    *ane_image_map;
+extern std::map<int,bbmsp_contact_t*>                *bbmsp_contact_map;
+extern std::map<int,bbmsp_user_profile_box_item_t*>  *bbmsp_profile_box_item_map;
 
 typedef enum {
    ANE_PENDING_REGISTRATION = 0,
@@ -79,7 +79,7 @@ extern ane_bbmsp_status_e              bbmStatus;
 extern ane_image_thread_status_e       imageThreadStatus;
 extern ane_contact_thread_status_e     contactThreadStatus;
 extern ane_profile_thread_status_e     profileThreadStatus;
-extern ane_profile_box_thread_status_e profileBoxThreadStatus;;
+extern ane_profile_box_thread_status_e profileBoxThreadStatus;
 
 extern FREContext currentContext;
 

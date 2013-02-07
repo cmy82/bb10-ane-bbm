@@ -36,7 +36,8 @@ typedef enum {
    START_LOADING_PROFILE_BOX,
    PROFILE_BOX_CHANGED_ADD,
    PROFILE_BOX_CHANGED_DEL,
-   PROFILE_BOX_CHANGED_ICN,
+   PROFILE_BOX_CHANGED_ICN_ADD,
+   PROFILE_BOX_CHANGED_ICN_RET
 } ane_profile_box_event_e;
 
 //======================================================================================//
@@ -44,45 +45,12 @@ typedef enum {
 //======================================================================================//
 
 void* initProfileBoxThread(void *data);
-static void notifyProfileBoxChanged();
+static void notifyProfileBoxChanged(char *event);
+
 
 //======================================================================================//
 //            STANDARD FUNCTIONS FROM bbmsp_user_profile_box.h QNX FILE
 //======================================================================================//
-
-/**
- * @brief Destroy a profile box item.
- * @details Destroys this profile box item and frees up the associated memory.
- * Does not change the user's BBM profile box.
- *
- * @param item A pointer to the item in the profile box to destroy.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see BBMSP_SUCCESS, BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_user_profile_box_item_destroy(bbmsp_user_profile_box_item_t** item);
-FREObject bbm_ane_bbmsp_user_profile_box_item_destroy(FREContext ctx, void* functionData,
-                                                      uint32_t argc, FREObject argv[]);
-
-/**
- * @brief Create a copy of a profile box item.
- * @details Once your app finishes processing a profile box event and returns
- * to the @c bps event loop, the @c bps library releases the original @c bps
- * event from memory, including the profile box item. This function copies a
- * profile box item into memory for use after your app calls @c bps_get_event
- * again.
- *
- * @param destination_item A pointer to an item created using
- * @c bbmsp_user_profile_box_item_create().
- * @param source_item A pointer to the profile box item to copy.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see BBMSP_SUCCESS, BBMSP_FAILURE, bbmsp_user_profile_box_item_create
- */
-//BBMSP_API bbmsp_result_t bbmsp_user_profile_box_item_copy(bbmsp_user_profile_box_item_t* destination_item,
-//                                                          bbmsp_user_profile_box_item_t* source_item);
-FREObject bbm_ane_bbmsp_user_profile_box_item_copy(FREContext ctx, void* functionData,
-                                                   uint32_t argc, FREObject argv[]);
 
 /**
  * @brief Retrieve the ID associated with a profile box item.
@@ -183,46 +151,6 @@ FREObject bbm_ane_bbmsp_user_profile_box_add_item(FREContext ctx, void* function
                                                   uint32_t argc, FREObject argv[]);
 
 /**
- * @brief Add an item to a user's profile box (no icon).
- * @details Add an item to a user's profile box with only text and a
- * customizable string (cookie).
- * @c text and @c cookie must be null-terminated C-strings, encoded as UTF-8.
- * The item text must not be null or empty. It can have a maximum of 100
- * characters with no more
- * than 2 new line characters. The cookie can be null and can have a maximum of
- * 128 characters.
- * If @c bbmsp_can_show_profile_box() returns false, this method will return @c
- * BBMSP_FAILURE.
- * @param text A pointer to the buffer that contains the item text.
-  * @param cookie A pointer to the buffer that contains the item cookie.
- *
- * @return BBMSP_ASYNC if successful, BBMSP_FAILURE if the application does not
- * have access to the BBMSP platform,
- * or if a parameter is invalid.
- */
-//BBMSP_API bbmsp_result_t bbmsp_user_profile_box_add_item_no_icon(const char* text, const char* cookie);
-FREObject bbm_ane_bbmsp_user_profile_box_add_item_no_icon(FREContext ctx, void* functionData,
-                                                          uint32_t argc, FREObject argv[]);
-
-/**
- * @brief Retrieve an item from a profile box by using the item ID.
- * @details Each profile box item is identified by a unique, non-negative,
- * numeric ID. If @c bbmsp_can_show_profile_box() returns false, this method
- * will return @c BBMSP_FAILURE.
- *
- * @param id A pointer to the buffer that contains the item ID.
- * @c id must be passed in as a null-terminated C-string, encoded as UTF-8.
- * @param item An updated pointer to the item.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see BBMSP_SUCCESS, BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_user_profile_box_get_item(const char* id,
-//                                                         bbmsp_user_profile_box_item_t* item);
-FREObject bbm_ane_bbmsp_user_profile_box_get_item(FREContext ctx, void* functionData,
-                                                  uint32_t argc, FREObject argv[]);
-
-/**
  * @brief Count the number of items in a list of profile box items.
  * @details If @c bbmsp_can_show_profile_box() returns false, this method will
  * return 0.
@@ -233,24 +161,6 @@ FREObject bbm_ane_bbmsp_user_profile_box_get_item(FREContext ctx, void* function
 //BBMSP_API unsigned int bbmsp_user_profile_box_items_size(bbmsp_user_profile_box_item_list_t* item_list);
 FREObject bbm_ane_bbmsp_user_profile_box_items_size(FREContext ctx, void* functionData,
                                                     uint32_t argc, FREObject argv[]);
-
-/**
- * @brief Retrieve an item from a profile box item list.
- * @details Individual items in a profile box list are accessed by index number.
- * Index numbers begin at 0.
- * If @c bbmsp_can_show_profile_box() returns false, this method will return a
- * null pointer.
- * @param item_list A pointer to the item list that contains the item to
- * retrieve.
- * @param index The index of the item to retrieve.
- *
- * @return A pointer to the item.
- */
-//BBMSP_API const bbmsp_user_profile_box_item_t*
-//                bbmsp_user_profile_box_itemlist_get_at(bbmsp_user_profile_box_item_list_t* item_list,
-//                                                       unsigned int index);
-FREObject bbm_ane_bbmsp_user_profile_box_itemlist_get_at(FREContext ctx, void* functionData,
-                                                         uint32_t argc, FREObject argv[]);
 
 /**
  * @brief Remove an item from the list of items in a profile box.
@@ -268,23 +178,6 @@ FREObject bbm_ane_bbmsp_user_profile_box_itemlist_get_at(FREContext ctx, void* f
 //BBMSP_API bbmsp_result_t bbmsp_user_profile_box_itemlist_remove_at(bbmsp_user_profile_box_item_list_t* item_list, unsigned int index);
 FREObject bbm_ane_bbmsp_user_profile_box_itemlist_remove_at(FREContext ctx, void* functionData,
                                                             uint32_t argc, FREObject argv[]);
-
-/**
- * @brief Remove a profile box item from the user's BBM profile box.
- * @details This process takes place asynchronously. If @c
- * bbmsp_can_show_profile_box() returns false, this method will return @c
- * BBMSP_FAILURE.
- *
- * @param itemid A pointer to the buffer that contains the @c itemid of the item
- * to remove.
- * @c itemid must be a null-terminated C-string, encoded as UTF-8.
- *
- * @return @c BBMSP_ASYNC is successful, @c BBMSP_FAILURE otherwise.
- * @see BBMSP_FAILURE, BBMSP_ASYNC
- */
-//BBMSP_API bbmsp_result_t bbmsp_user_profile_box_remove_item(const char* itemid);
-FREObject bbm_ane_bbmsp_user_profile_box_remove_item(FREContext ctx, void* functionData,
-                                                     uint32_t argc, FREObject argv[]);
 
 /**
  * @brief Remove all items in the profile box from the user's BlackBerry device.
@@ -337,44 +230,6 @@ FREObject bbm_ane_bbmsp_user_profile_box_register_icon(FREContext ctx, void* fun
 //BBMSP_API bbmsp_result_t bbmsp_user_profile_box_retrieve_icon(const int32_t icon_id);
 FREObject bbm_ane_bbmsp_user_profile_box_retrieve_icon(FREContext ctx, void* functionData,
                                                        int32_t argc, FREObject argv[]);
-
-/**
- * @brief Retrieve the @c icon_id for an image that was retrieved from the
- * user's profile box.
- * @details When an image is retrieved from a user's profile box, the
- * BBMSP_SP_EVENT_USER_PROFILE_BOX_ICON_RETRIEVED event is triggered.
- * If @c bbmsp_can_show_profile_box() returns false, this method will return @c
- * BBMSP_FAILURE.
- * @param event A pointer to the event that was triggered when the image was
- * retrieved.
- * @param icon_id Updated with the id of the icon
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see bbmsp_event_type_t, BBMSP_SUCCESS, BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_event_user_profile_box_icon_retrieved_get_icon_id(bbmsp_event_t* event,
-//                                                                                 int32_t* icon_id);
-FREObject bbm_ane_bbmsp_event_user_profile_box_icon_retrieved_get_icon_id(FREContext ctx, void* functionData,
-                                                                          uint32_t argc, FREObject argv[]);
-
-/**
- * @brief Retrieve the image that was retrieved from a user's profile box.
- * @details When a user's profile box image is retrieved, the
- * BBMSP_SP_EVENT_USER_PROFILE_BOX_ICON_RETRIEVED event is triggered.
- * If @c bbmsp_can_show_profile_box() returns false, this method will return @c
- * BBMSP_FAILURE.
- * @param event A pointer to the event that was triggered when the image was
- * retrieved.
- * @param icon_image An updated pointer to the image.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see bbmsp_event_type_t, BBMSP_SUCCESS, BBMSP_FAILURE
- */
-//BBMSP_API bbmsp_result_t bbmsp_event_user_profile_box_icon_retrieved_get_icon_image(bbmsp_event_t* event,
-//                                                                                    bbmsp_image_t** icon_image);
-FREObject bbm_ane_bbmsp_event_user_profile_box_icon_retrieved_get_icon_image(FREContext ctx,
-                                                                             void* functionData,
-                                                                             uint32_t argc, FREObject argv[]);
 
 
 

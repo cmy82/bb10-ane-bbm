@@ -31,10 +31,11 @@ typedef enum {
    IMAGE_THREAD_STOPPED
 } ane_image_thread_status_e;
 
-//Create struct to keep an original copy as well as a profile avata sized copy of each image
+//Create struct to keep an original copy as well as a profile avatar sized copy of each image
 typedef struct {
    bbmsp_image_t *original;
    bbmsp_image_t *profile;
+   int32_t       iconID;
 } ane_image_s;
 
 //======================================================================================//
