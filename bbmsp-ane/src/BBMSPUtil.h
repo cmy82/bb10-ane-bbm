@@ -31,6 +31,12 @@ typedef enum {
    IMAGE_THREAD_STOPPED
 } ane_image_thread_status_e;
 
+//Create struct to keep an original copy as well as a profile avata sized copy of each image
+typedef struct {
+   bbmsp_image_t *original;
+   bbmsp_image_t *profile;
+} ane_image_s;
+
 //======================================================================================//
 //          CUSTOM FUNCTIONS
 //======================================================================================//
@@ -106,6 +112,8 @@ FREObject bbm_ane_bbmsp_image_get_type(FREContext ctx, void* functionData,
 //BBMSP_API char* bbmsp_image_get_data(bbmsp_image_t* image);
 FREObject bbm_ane_bbmsp_image_get_data(FREContext ctx, void* functionData,
                                        uint32_t argc, FREObject argv[]);
+FREObject bbm_ane_bbmsp_image_get_profile_data(FREContext ctx, void* functionData,
+                                               uint32_t argc, FREObject argv[]);
 
 /**
  * @brief Returns the size of image object.
@@ -117,6 +125,8 @@ FREObject bbm_ane_bbmsp_image_get_data(FREContext ctx, void* functionData,
 //BBMSP_API unsigned int bbmsp_image_get_data_size(bbmsp_image_t* image);
 FREObject bbm_ane_bbmsp_image_get_data_size(FREContext ctx, void* functionData,
                                             uint32_t argc, FREObject argv[]);
+FREObject bbm_ane_bbmsp_image_get_profile_data_size(FREContext ctx, void* functionData,
+                                                    uint32_t argc, FREObject argv[]);
 
 
 

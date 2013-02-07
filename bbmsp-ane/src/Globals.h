@@ -65,8 +65,8 @@ extern int ane_profile_box_channel_id;
 
 extern int runCount;
 
-extern std::map<int,bbmsp_image_t *>                      *bbmsp_image_map;
-extern std::map<int,bbmsp_contact_t *>                    *bbmsp_contact_map;
+extern std::map<int,ane_image_s*>                        *ane_image_map;
+extern std::map<int,bbmsp_contact_t*>                    *bbmsp_contact_map;
 //extern std::map<int,bbmsp_user_profile_box_item_t *>      bbmsp_profile_item_map;
 
 typedef enum {

@@ -94,7 +94,7 @@ FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc,
 	itoa(runCount,temp3,10);
 	itoa(ane_master_domain,temp4,10);
 	itoa(ane_master_channel_id,temp5,10);
-	itoa(bbmsp_image_map->size(),temp7,10);
+	itoa(ane_image_map->size(),temp7,10);
 	itoa(bbmsp_contact_map->size(),temp9,10);
 
 	switch( aneThreadState ){
@@ -284,7 +284,7 @@ static void* initAneThread(void *data){
                     bps_event_t         *aneProfileEvent;
                     bps_event_payload_t payload;
 
-                    bbmsp_profile_t *updated;
+                    bbmsp_profile_t *updated, *updated_copy;
                     bbmsp_profile_create(&updated);
                     bbmsp_event_profile_changed_get_profile(bbmspEvent,&updated);
 
@@ -306,14 +306,12 @@ static void* initAneThread(void *data){
                     bps_event_t         *aneProfileBoxEvent;
                     bps_event_payload_t payload;
 
-                    bbmsp_user_profile_box_item_t *added;
-                    bbmsp_user_profile_box_item_create(&added);
+                    bbmsp_user_profile_box_item_t *added, *added_copy;
+                    bbmsp_user_profile_box_item_create(&added_copy);
                     bbmsp_event_user_profile_box_item_added_get_item(bbmspEvent,added);
+                    bbmsp_user_profile_box_item_copy(added_copy,added);
 
-
-
-                    payload.data1 = (uintptr_t)added;
-                    //payload.data2 = (uintptr_t)(&presence);
+                    payload.data1 = (uintptr_t)added_copy;
 
                     bps_event_create(&aneProfileBoxEvent, ane_profile_box_domain,
                                      PROFILE_BOX_CHANGED_ADD, &payload, &bpsEventComplete);
@@ -325,14 +323,12 @@ static void* initAneThread(void *data){
                     bps_event_t         *aneProfileBoxEvent;
                     bps_event_payload_t payload;
 
-                    bbmsp_user_profile_box_item_t *removed;
-                    bbmsp_user_profile_box_item_create(&removed);
+                    bbmsp_user_profile_box_item_t *removed, *removed_copy;
+                    bbmsp_user_profile_box_item_create(&removed_copy);
                     bbmsp_event_user_profile_box_item_removed_get_item(bbmspEvent,removed);
+                    bbmsp_user_profile_box_item_copy(removed_copy,removed);
 
-
-
-                    payload.data1 = (uintptr_t)removed;
-                    //payload.data2 = (uintptr_t)(&presence);
+                    payload.data1 = (uintptr_t)removed_copy;
 
                     bps_event_create(&aneProfileBoxEvent, ane_profile_box_domain,
                                      PROFILE_BOX_CHANGED_DEL, &payload, &bpsEventComplete);
@@ -345,17 +341,17 @@ static void* initAneThread(void *data){
                     bps_event_payload_t payload;
 
                     int32_t iconID;
-
                     bbmsp_event_user_profile_box_icon_added_get_icon_id(bbmspEvent,&iconID);
 
-
-
                     payload.data1 = (uintptr_t)iconID;
-                    //payload.data2 = (uintptr_t)(&presence);
 
                     bps_event_create(&aneProfileBoxEvent, ane_profile_box_domain,
                                      PROFILE_BOX_CHANGED_ICN, &payload, &bpsEventComplete);
                     bps_channel_push_event(ane_profile_box_channel_id, aneProfileBoxEvent);
+                 }
+
+                 if( eventType == BBMSP_SP_EVENT_USER_PROFILE_BOX_ICON_RETRIEVED ){
+
                  }
               }
 
@@ -475,6 +471,8 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                    "bbm_ane_bbmsp_image_get_type",
                                    "bbm_ane_bbmsp_image_get_data",
                                    "bbm_ane_bbmsp_image_get_data_size",
+                                   "bbm_ane_bbmsp_image_get_profile_data",
+                                   "bbm_ane_bbmsp_image_get_profile_data_size",
                                    "bbm_ane_image_exists",
                                    //ACCESS
                                    "bbm_ane_bbmsp_is_access_allowed",
@@ -506,6 +504,8 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                   bbm_ane_bbmsp_image_get_type,
                                   bbm_ane_bbmsp_image_get_data,
                                   bbm_ane_bbmsp_image_get_data_size,
+                                  bbm_ane_bbmsp_image_get_profile_data,
+                                  bbm_ane_bbmsp_image_get_profile_data_size,
                                   bbm_ane_image_exists,
                                   bbm_ane_bbmsp_is_access_allowed,
                                   bbm_ane_bbmsp_can_show_profile_box,

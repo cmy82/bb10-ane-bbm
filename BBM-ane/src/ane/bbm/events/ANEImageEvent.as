@@ -5,6 +5,8 @@ package ane.bbm.events {
    public class ANEImageEvent extends Event {
       public static const IMAGE_LOADED:String    = "ANEImageLoaded";
       public static const IMAGE_RETRIEVED:String = "ANEImageRetrieved";
+      public static const PROF_IMAGE_LOADED:String    = "ANEProfileImageLoaded";
+      public static const PROF_IMAGE_RETRIEVED:String = "ANEProfileImageRetrieved";
       
       private var _id:Number = NaN;
       private var _filename:String = "";

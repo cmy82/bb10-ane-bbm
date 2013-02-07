@@ -128,6 +128,7 @@ void* initProfileThread(void *data){
                      pthread_mutex_unlock(&profileMutex);
                   }
 
+                  if( updated != NULL ) bbmsp_profile_destroy(&updated);
                   profileThreadStatus = LOADING_PROFILE;
                   break;
                }
@@ -215,9 +216,14 @@ FREObject bbm_ane_bbmsp_set_user_profile_display_picture(FREContext ctx, void* f
                                                          uint32_t argc, FREObject argv[]){
    int imageID;
    FREGetObjectAsInt32(argv[0],&imageID);
-   bbmsp_image_t *image = (*bbmsp_image_map)[imageID];
+   cout << "trying to retrieve images for id " << imageID << endl;
+   //bbmsp_image_t *image = (*bbmsp_image_map)[imageID];
+   ane_image_s *images = (*ane_image_map)[imageID];
 
-   bbmsp_result_t code = bbmsp_set_user_profile_display_picture(image);
+   if( (images->profile) == NULL ) cout << "profile image null" << endl;
+   cout << "about to call set user profile display picture: " << imageID << endl;
+   bbmsp_result_t code = bbmsp_set_user_profile_display_picture(images->profile);
+   cout << "Result of call to change profile picture: " << code << endl;
    FREObject result;
    FRENewObjectFromUint32(code, &result);
 
@@ -353,11 +359,22 @@ FREObject bbm_ane_bbmsp_profile_get_display_picture(FREContext ctx, void* functi
    }
    pthread_mutex_unlock(&profileMutex);
 
-   bbmsp_image_t *usrPicture;
+   cout << "getting profile picture and a copy since the picture is not yet cached" << endl;
+   bbmsp_image_t *usrPicture, *usrPicture_copy;
    bbmsp_image_create_empty(&usrPicture);
+   bbmsp_image_create_empty(&usrPicture_copy);
    bbmsp_profile_get_display_picture(userProfile,usrPicture);
+   bbmsp_profile_get_display_picture(userProfile,usrPicture_copy);
+   cout << "was able to get and create images" << endl;
+
+   cout << "creating struct to hold images and inserting into map cache" << endl;
    userProfilePictureID = rand();
-   bbmsp_image_map->insert( std::pair<int,bbmsp_image_t*>(userProfilePictureID,usrPicture) );
+   //bbmsp_image_map->insert( std::pair<int,bbmsp_image_t*>(userProfilePictureID,usrPicture) );
+   ane_image_s *images = (ane_image_s*)malloc(sizeof(ane_image_s));
+   images->original = usrPicture;
+   images->profile = usrPicture_copy;
+   ane_image_map->insert( std::pair<int,ane_image_s*>(userProfilePictureID,images) );
+   cout << "pushed images into the map" << endl;
 
    pthread_mutex_lock(&profileMutex);
    userProfilePicChanged = 0;
@@ -426,9 +443,10 @@ FREObject bbm_ane_bbmsp_profile_set_display_picture(FREContext ctx, void* functi
                                                     uint32_t argc, FREObject argv[]){
    int imageID;
    FREGetObjectAsInt32(argv[0],&imageID);
-   bbmsp_image_t *image = (*bbmsp_image_map)[imageID];
+   //bbmsp_image_t *image = (*bbmsp_image_map)[imageID];
+   ane_image_s *images = (*ane_image_map)[imageID];
 
-   bbmsp_result_t code = bbmsp_profile_set_display_picture(userProfile,image);
+   bbmsp_result_t code = bbmsp_profile_set_display_picture(userProfile,images->profile);
    FREObject result;
    FRENewObjectFromUint32(code, &result);
    return result;

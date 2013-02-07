@@ -112,40 +112,37 @@ package ane.bbm {
             var image2:ImageTracker = findByName(imageFile.name);
             dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_LOADED,image2.id,imageFile.name) );            
          }
-         
-         //var loader:Loader = new Loader();
-         //loader.contentLoaderInfo.addEventListener(Event.COMPLETE,imageLoaded)
-         //loader.loadBytes(imageBytes);
       }
-      
-      private function imageLoaded(e:Event):void {
-         var loaderInfo:LoaderInfo = e.target as LoaderInfo;
-         var loader:Loader = loaderInfo.loader;
-         var smallImg:Bitmap = Bitmap(loader.content);           
-         var jpg:JPGEncoder = new JPGEncoder(70);
-         var ba:ByteArray  = jpg.encode(smallImg.bitmapData);
-         
-         trace("URL from loader object: "+loaderInfo.url);
-         var result:Object = 
-            this._context.call( "bbm_ane_bbmsp_image_create", "JPG", ba.length, ba );
-         var image:ImageTracker = new ImageTracker(loaderInfo.url,Number(result));
-         _imageList.push(image);
-      }
-      
+           
       //=============================== RETRIEVING FUNCTIONS ====================================
       public function retrieveImage(id:Number):void {
+         trace("Calling retrieve image for id: "+id);
          var size:Object = this._context.call( "bbm_ane_bbmsp_image_get_data_size", id );
          var imgData:ByteArray = new ByteArray();
          imgData.length = Number(size);
-         
+         trace("image size: "+imgData.length);
 		   this._context.call( "bbm_ane_bbmsp_image_get_data", id, imgData );
-         
+         trace("creating loader object to pull back image");
          var loader:Loader = new Loader();
          loader.contentLoaderInfo.addEventListener(Event.COMPLETE,imageRetrieved)
          loader.loadBytes(imgData);         
       }
+      
+      public function retrieveProfileImage(id:Number):void {
+         trace("Calling retrieve profile image for id: "+id);
+         var size:Object = this._context.call( "bbm_ane_bbmsp_image_get_profile_data_size", id );
+         var imgData:ByteArray = new ByteArray();
+         imgData.length = Number(size);
+         trace("image size: "+imgData.length);
+         this._context.call( "bbm_ane_bbmsp_image_get_profile_data", id, imgData );
+         trace("creating loader object to pull back profile image");
+         var loader:Loader = new Loader();
+         loader.contentLoaderInfo.addEventListener(Event.COMPLETE,profileImageRetrieved)
+         loader.loadBytes(imgData);         
+      }
                                
       private function imageRetrieved(e:Event):void {
+         trace("image retrieved called after image loaded by loader");
          var loaderInfo:LoaderInfo = e.target as LoaderInfo;
          var loader:Loader = loaderInfo.loader;     
 		 
@@ -156,10 +153,24 @@ package ane.bbm {
 		   dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_RETRIEVED,0,"",bmp) );
       }
       
+      private function profileImageRetrieved(e:Event):void {
+         trace("profile image retrieved called after image loaded by loader");
+         var loaderInfo:LoaderInfo = e.target as LoaderInfo;
+         var loader:Loader = loaderInfo.loader;     
+         
+         var bitmapData:BitmapData = new BitmapData(loaderInfo.width, loaderInfo.height, true, 0xFFFFFF);
+         bitmapData.draw(loaderInfo.loader);
+         
+         var bmp:Bitmap = new Bitmap(bitmapData);
+         dispatchEvent( new ANEImageEvent(ANEImageEvent.PROF_IMAGE_RETRIEVED,0,"",bmp) );
+      }
+      
       //======================================= MISCELLANEOUS FUNCTIONS =================================
       private function imageStatusUpdate(e:StatusEvent):void {
+         trace("Image status event ["+e.code+"] for id "+e.level);
          if(e.code == ANEImageEvent.IMAGE_LOADED ){
             var id:Number = Number(e.level);
+            trace("ID for loaded image: "+id);
             var file:String = findByID(id).name;
             dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_LOADED,id,file) );            
          }

@@ -17,6 +17,7 @@
    import qnx.fuse.ui.text.TextAlign;
    import qnx.fuse.ui.text.TextFormat;
    
+   [SWF(frameRate="30")]
    public class BBM_ANE_Test extends Sprite {
       
       var testLbl:Label;
@@ -114,6 +115,7 @@
          NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
          
          this.addEventListener(Event.ADDED_TO_STAGE,init);
+         this.addEventListener(Event.ENTER_FRAME,testUUID);
       }
       
       private function init(e:Event):void {
@@ -127,7 +129,7 @@
          }
       }
       
-      public function testUUID(e:MouseEvent):void {         
+      public function testUUID(e:Event):void {         
          var out:Object = bbmExtension.checkStatus();
          testLbl.text = out.toString();
       }
@@ -151,6 +153,8 @@
       }
       
       private function retrieveImage(e:ANEImageEvent):void {
+         trace("calling retrieve image for loaded profile image "+e.id);
+         //need to call function to get the profile image back and not the fullimage
          var id:Number = e.id;
          imgId = id;
          bbmExtension.bbmspImages.retrieveImage(id);
@@ -161,11 +165,6 @@
          pic.bitmapData = ImageResizer.bilinearIterative(pic.bitmapData,225,250,ResizeMath.METHOD_PAN_AND_SCAN);
          if( imgHolder.numChildren > 0 ) imgHolder.removeChildAt(0);
          imgHolder.addChild( new Bitmap(pic.bitmapData.clone()) );
-         
-         //if( usrSelected ){
-         //   bbmExtension.bbmspUserProfile.setUserProfileDisplayPicture(e.id);
-         //   usrSelected = false;
-         //}
       }
       
       private function updateHandle(e:ANEUserProfileEvent):void {
@@ -208,13 +207,15 @@ class ProfileCard extends Sprite {
    private var statMsg:TextArea;
    private var persMsg:TextArea;
    private var status:ToggleSwitch;
+   private var imgID:Number;
    
    public function ProfileCard(bbm:BBMAne,pic:Bitmap) {
       _bbm = bbm;
       _pic = pic;
       this.addEventListener(Event.ADDED_TO_STAGE,init);  
-      this.addEventListener(Event.REMOVED_FROM_STAGE,cleanup);
-      _bbm.bbmspImages.addEventListener(ANEImageEvent.IMAGE_RETRIEVED,displayImage);
+      this.addEventListener(Event.REMOVED_FROM_STAGE,cleanup);      
+      _bbm.bbmspImages.addEventListener(ANEImageEvent.PROF_IMAGE_RETRIEVED,displayImage);   
+      _bbm.bbmspImages.addEventListener(ANEImageEvent.IMAGE_LOADED,retrieveProfileImage);
    }
    
    public function init(e:Event):void {
@@ -247,7 +248,7 @@ class ProfileCard extends Sprite {
       img.x = this.width - 255;
       img.y = 0;
       img.graphics.beginFill(0xAAAAAA,0.8);
-      img.graphics.drawRoundRect(0,0,225,250,20);
+      img.graphics.drawRoundRect(0,0,120,120,20);
       img.graphics.endFill();
       img.addEventListener(MouseEvent.CLICK,callLoadImage);
       img.addChild(_pic);
@@ -310,8 +311,8 @@ class ProfileCard extends Sprite {
       this.y = stage.stageHeight/4;      
    }
    
-   private function cleanup(e:Event){
-      _bbm.bbmspImages.removeEventListener(ANEImageEvent.IMAGE_RETRIEVED,displayImage);   
+   private function cleanup(e:Event):void {
+      _bbm.bbmspImages.removeEventListener(ANEImageEvent.PROF_IMAGE_RETRIEVED,displayImage);   
    }
    
    private function closeProfile(e:MouseEvent):void {
@@ -327,7 +328,7 @@ class ProfileCard extends Sprite {
          var code:int = 1;
          if( status.selected ) code = 0;
          _bbm.bbmspUserProfile.setUserProfileStatus( code, statMsg.text );
-      }
+      }            
       
       stage.removeChild(this);
    }
@@ -337,10 +338,19 @@ class ProfileCard extends Sprite {
    }
    
    private function displayImage(e:ANEImageEvent):void {
+      trace("calling display image after image sent to ANE for caching: "+e.id);
       var pic:Bitmap = e.image;
       pic.bitmapData = ImageResizer.bilinearIterative(pic.bitmapData,225,250,ResizeMath.METHOD_PAN_AND_SCAN);
       img.addChild( new Bitmap(pic.bitmapData.clone()) );      
-      _bbm.bbmspUserProfile.setUserProfileDisplayPicture(e.id);      
+      trace("Calling set user profile image");
+      //cannot use e.id as this is not populated for retrieved images
+      //_bbm.bbmspUserProfile.setUserProfileDisplayPicture(imgID);      
+   }
+   
+   private function retrieveProfileImage(e:ANEImageEvent):void {
+      var id:Number = e.id;
+      imgID = id;
+      _bbm.bbmspImages.retrieveProfileImage(id);
    }
 }
 
