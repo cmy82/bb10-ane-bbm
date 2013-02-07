@@ -284,7 +284,7 @@ static void* initAneThread(void *data){
                     bps_event_t         *aneProfileEvent;
                     bps_event_payload_t payload;
 
-                    bbmsp_profile_t *updated, *updated_copy;
+                    bbmsp_profile_t *updated;
                     bbmsp_profile_create(&updated);
                     bbmsp_event_profile_changed_get_profile(bbmspEvent,&updated);
 

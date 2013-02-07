@@ -343,8 +343,7 @@ class ProfileCard extends Sprite {
       pic.bitmapData = ImageResizer.bilinearIterative(pic.bitmapData,225,250,ResizeMath.METHOD_PAN_AND_SCAN);
       img.addChild( new Bitmap(pic.bitmapData.clone()) );      
       trace("Calling set user profile image");
-      //cannot use e.id as this is not populated for retrieved images
-      //_bbm.bbmspUserProfile.setUserProfileDisplayPicture(imgID);      
+      _bbm.bbmspUserProfile.setUserProfileDisplayPicture(imgID);      
    }
    
    private function retrieveProfileImage(e:ANEImageEvent):void {

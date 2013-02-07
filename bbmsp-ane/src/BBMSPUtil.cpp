@@ -108,12 +108,14 @@ void* initImageThread(void *data){
             int maxHeight = 300;
 
             image.loadFromData((uchar *)imageData->data,(int)imageData->size,0);
+            image = image.convertToFormat(QImage::Format_ARGB4444_Premultiplied);
             scaled = image.scaled(maxWidth,maxHeight,Qt::KeepAspectRatio);
             while( scaled.byteCount() > 32768 ){
                //To save image must be smaller than 32k
                maxWidth-=10;
                maxHeight-=10;
                scaled = image.scaled(maxWidth,maxHeight,Qt::KeepAspectRatio);
+               cout << "image was too large and had to be scaled: " << maxWidth << "x" << maxHeight << endl;
             }
             scaled.save(tempAvatar);
 
@@ -177,7 +179,7 @@ void* initImageThread(void *data){
                bbmsp_image_destroy(&(images->original));
                bbmsp_image_destroy(&(images->profile));
             }
-            delete bbmsp_image_map;
+            delete ane_image_map;
             break;
 
          case IMAGE_THREAD_STOPPED:

@@ -26,34 +26,24 @@ did user change picture: 0
 was profile pictured changed: 1
 getting profile picture and a copy since the picture is not yet cached
 was able to get and create images
+size of profile picture: 3156
 creating struct to hold images and inserting into map cache
 pushed images into the map
 About to call bbmsp_contact_list_get
 Called bbmsp_contact_list_get
-image too large and had to be scaled down 290x290
-image too large and had to be scaled down 280x280
-image too large and had to be scaled down 270x270
-image too large and had to be scaled down 260x260
-image too large and had to be scaled down 250x250
-image too large and had to be scaled down 240x240
-image too large and had to be scaled down 230x230
-image too large and had to be scaled down 220x220
-image too large and had to be scaled down 210x210
-image too large and had to be scaled down 200x200
-image too large and had to be scaled down 190x190
-image too large and had to be scaled down 180x180
-image too large and had to be scaled down 170x170
-image too large and had to be scaled down 160x160
-image too large and had to be scaled down 150x150
-image too large and had to be scaled down 140x140
-image too large and had to be scaled down 130x130
-image too large and had to be scaled down 120x120
-setAvatar: data size: 3565 data: ÿØÿà
-creating images to store the orignal and profile images
-images and struct created
-no error reading in profile image. able to cache both
-images inserted with an id of 5758
-inserted into map. freed up unneeded memory
+image was too large and had to be scaled: 290x290
+image was too large and had to be scaled: 280x280
+image was too large and had to be scaled: 270x270
+image was too large and had to be scaled: 260x260
+image was too large and had to be scaled: 250x250
+image was too large and had to be scaled: 240x240
+image was too large and had to be scaled: 230x230
+image was too large and had to be scaled: 220x220
+image was too large and had to be scaled: 210x210
+image was too large and had to be scaled: 200x200
+image was too large and had to be scaled: 190x190
+image was too large and had to be scaled: 180x180
+image was too large and had to be scaled: 170x170
 returning from call
 trying to retrieve images for id 5758
 about to call set user profile display picture: 5758
@@ -65,5 +55,14 @@ Profile event changed code received
 Profile retrieved from event
 Profile presence status retrieved from event
 User profile picture was changed, reload
-
-Process 232325312 (adl) terminated SIGSEGV code=2 fltno=11 ip=791fb432(/base/usr/lib/libbbmsp.so.1@_btext+0x24a2) mapaddr=0000b432. ref=7a37e7b8 bdslot=1
+Reloaded user profile
+getting user profile picture 
+Waiting on BPS event in profile thread
+did user change picture: 1
+was profile pictured changed: 1
+user changed profile pic - returning stored profile picture id: 5758
+Waiting on contact list to be populated
+BPS Event received in ContactList thread
+Contact list event
+Contact list ready to be retrieved
+Retrieved 0 contacts

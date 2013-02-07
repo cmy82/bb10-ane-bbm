@@ -35,18 +35,10 @@ package ane.bbm {
                var result:Object = this._context.call( "bbm_ane_bbmsp_image_get_type", id );
                var type:Number = Number(result);
                switch(type){
-                  case 0:
-                     return "JPG";
-                     break;
-                  case 1:
-                     return "PNG";
-                     break;
-                  case 2:
-                     return "GIF";
-                     break
-                  case 3:
-                     return "BMP";
-                     break;
+                  case 0:  return "JPG";  break;
+                  case 1:  return "PNG";  break;
+                  case 2:  return "GIF";  break
+                  case 3:  return "BMP";  break;
                }              
             }
          }
@@ -116,33 +108,26 @@ package ane.bbm {
            
       //=============================== RETRIEVING FUNCTIONS ====================================
       public function retrieveImage(id:Number):void {
-         trace("Calling retrieve image for id: "+id);
          var size:Object = this._context.call( "bbm_ane_bbmsp_image_get_data_size", id );
          var imgData:ByteArray = new ByteArray();
          imgData.length = Number(size);
-         trace("image size: "+imgData.length);
-		   this._context.call( "bbm_ane_bbmsp_image_get_data", id, imgData );
-         trace("creating loader object to pull back image");
+         this._context.call( "bbm_ane_bbmsp_image_get_data", id, imgData );
          var loader:Loader = new Loader();
          loader.contentLoaderInfo.addEventListener(Event.COMPLETE,imageRetrieved)
          loader.loadBytes(imgData);         
       }
       
       public function retrieveProfileImage(id:Number):void {
-         trace("Calling retrieve profile image for id: "+id);
          var size:Object = this._context.call( "bbm_ane_bbmsp_image_get_profile_data_size", id );
          var imgData:ByteArray = new ByteArray();
          imgData.length = Number(size);
-         trace("image size: "+imgData.length);
          this._context.call( "bbm_ane_bbmsp_image_get_profile_data", id, imgData );
-         trace("creating loader object to pull back profile image");
          var loader:Loader = new Loader();
          loader.contentLoaderInfo.addEventListener(Event.COMPLETE,profileImageRetrieved)
          loader.loadBytes(imgData);         
       }
                                
       private function imageRetrieved(e:Event):void {
-         trace("image retrieved called after image loaded by loader");
          var loaderInfo:LoaderInfo = e.target as LoaderInfo;
          var loader:Loader = loaderInfo.loader;     
 		 
@@ -154,7 +139,6 @@ package ane.bbm {
       }
       
       private function profileImageRetrieved(e:Event):void {
-         trace("profile image retrieved called after image loaded by loader");
          var loaderInfo:LoaderInfo = e.target as LoaderInfo;
          var loader:Loader = loaderInfo.loader;     
          
@@ -167,10 +151,8 @@ package ane.bbm {
       
       //======================================= MISCELLANEOUS FUNCTIONS =================================
       private function imageStatusUpdate(e:StatusEvent):void {
-         trace("Image status event ["+e.code+"] for id "+e.level);
          if(e.code == ANEImageEvent.IMAGE_LOADED ){
             var id:Number = Number(e.level);
-            trace("ID for loaded image: "+id);
             var file:String = findByID(id).name;
             dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_LOADED,id,file) );            
          }
