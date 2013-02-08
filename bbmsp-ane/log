@@ -1,16 +1,23 @@
 err: config: Failed to open file (/etc/system/config/qnxair_variant.conf): No such file or directory	(tid:1)
 Request to receive BBMSP events successful for ANE thread [4]
 Waiting on BPS event in profile thread
+Waiting on BPS event in ANE thread
+BPS Event received in ANE thread
+Waiting on BPS event in ANE thread
 Waiting on BPS event in profile box thread
-Waiting on BPS event in ANE thread
-BPS Event received in ANE thread
-Waiting on BPS event in ANE thread
 BPS Event received in ANE thread
 BBMSP event received in ANE thread
 Waiting on BPS event in ANE thread
 BPS Event received in ANE thread
 BBMSP event received in ANE thread
 Waiting on BPS event in ANE thread
+About to call bbmsp_contact_list_get
+Called bbmsp_contact_list_get
+Waiting on contact list to be populated
+BPS Event received in ContactList thread
+Contact list event
+Contact list ready to be retrieved
+Retrieved 0 contacts
 BPS Event received in ANE thread
 Custom event for registration status received in ANE thread
 BPS event received in profile thread
@@ -26,43 +33,39 @@ did user change picture: 0
 was profile pictured changed: 1
 getting profile picture and a copy since the picture is not yet cached
 was able to get and create images
-size of profile picture: 3156
+size of profile picture: 5251
 creating struct to hold images and inserting into map cache
 pushed images into the map
-About to call bbmsp_contact_list_get
-Called bbmsp_contact_list_get
-image was too large and had to be scaled: 290x290
-image was too large and had to be scaled: 280x280
-image was too large and had to be scaled: 270x270
-image was too large and had to be scaled: 260x260
-image was too large and had to be scaled: 250x250
-image was too large and had to be scaled: 240x240
-image was too large and had to be scaled: 230x230
-image was too large and had to be scaled: 220x220
-image was too large and had to be scaled: 210x210
-image was too large and had to be scaled: 200x200
-image was too large and had to be scaled: 190x190
-image was too large and had to be scaled: 180x180
-image was too large and had to be scaled: 170x170
-returning from call
-trying to retrieve images for id 5758
-about to call set user profile display picture: 5758
-Result of call to change profile picture: 1
-profile picture was set by user - not needed to be retrieved
-============BBMSP Profile Changed Event Received===========
-BPS event received in profile thread
-Profile event changed code received
-Profile retrieved from event
-Profile presence status retrieved from event
-User profile picture was changed, reload
-Reloaded user profile
-getting user profile picture 
-Waiting on BPS event in profile thread
-did user change picture: 1
-was profile pictured changed: 1
-user changed profile pic - returning stored profile picture id: 5758
-Waiting on contact list to be populated
-BPS Event received in ContactList thread
-Contact list event
-Contact list ready to be retrieved
-Retrieved 0 contacts
+
+====== Adding profile box item ======
+hhhhgftygfdfgv:hhhhgftygfdfgv
+fgbvvgfcggtyhgftffhjfvff:fgbvvgfcggtyhgftffhjfvff
+Icon: -1
+
+============BBMSP Profile Box Item Added Event Received===========
+BPS event received in profile box thread
+Loaded user profile box
+Waiting on BPS event in profile box thread
+
+====== Adding profile box item ======
+bbhhgbhhbh:bbhhgbhhbh
+vgffghghhhvfggf:vgffghghhhvfggf
+Icon: -1
+
+============BBMSP Profile Box Item Added Event Received===========
+BPS event received in profile box thread
+Loaded user profile box
+Waiting on BPS event in profile box thread
+
+====== Adding profile box item ======
+gyyhghhgh:gyyhghhgh
+vhjghhchhfyhvghhgyhggubvjh:vhjghhchhfyhvghhgyhggubvjh
+Icon: -1
+
+============BBMSP Profile Box Item Added Event Received===========
+BPS event received in profile box thread
+Loaded user profile box
+Waiting on BPS event in profile box thread
+============BBMSP Profile Box Item Removed Event Received===========
+
+Process 345047235 (adl) terminated SIGSEGV code=1 fltno=11 ip=79070c34(/base/usr/lib/libbbmsp.so.1@bbmsp_event_user_profile_box_item_removed_get_item+0x67) mapaddr=00030c34. ref=00000000 bdslot=1

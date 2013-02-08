@@ -108,6 +108,7 @@
          inviteBtn.addEventListener(MouseEvent.CLICK,callSendDownload);
          //imgHolder.addEventListener(MouseEvent.CLICK,callLoadImage);    
          ldProfBtn.addEventListener(MouseEvent.CLICK,displayProfile);
+         ldProfBxItmBtn.addEventListener(MouseEvent.CLICK,displayProfileBox);
          
          addChild(testBtn);
          addChild(regBtn);
@@ -157,6 +158,11 @@
       public function displayProfile(e:MouseEvent):void {
          var profile:ProfileCard = new ProfileCard(bbmExtension,new Bitmap(Bitmap(imgHolder.getChildAt(0)).bitmapData.clone()));
          this.stage.addChild(profile);
+      }
+      
+      public function displayProfileBox(e:MouseEvent):void {
+         var profileBox:ProfileBoxCard = new ProfileBoxCard(bbmExtension);
+         this.stage.addChild(profileBox);
       }
       
       private function retrieveImage(e:ANEImageEvent):void {
@@ -357,6 +363,140 @@ class ProfileCard extends Sprite {
       var id:Number = e.id;
       imgID = id;
       _bbm.bbmspImages.retrieveProfileImage(id);
+   }
+}
+
+
+class ProfileBoxCard extends Sprite {
+   private var _bbm:BBMAne;
+   private var _pic1:Bitmap; //FFVII - 1001
+   private var _pic2:Bitmap; //ZELDA - 1002
+   private var _pic3:Bitmap; //HALO  - 1003
+   private var txtMsg:TextArea;
+   private var cookieMsg:TextArea; 
+   private var choice:SegmentedControl;
+   
+   public function ProfileBoxCard(bbm:BBMAne) {
+      _bbm = bbm;
+      this.addEventListener(Event.ADDED_TO_STAGE,init);  
+      this.addEventListener(Event.REMOVED_FROM_STAGE,cleanup);      
+      
+   }
+   
+   public function init(e:Event):void {
+      this.removeEventListener(Event.ADDED_TO_STAGE,init);
+      
+      this.graphics.beginFill(0x999999,1.0);
+      this.graphics.drawRoundRect(0,0,stage.stageWidth,stage.stageHeight/2,30);
+      this.graphics.endFill();
+      this.graphics.beginFill(0xDCDCDC,1.0);
+      this.graphics.drawRoundRect(10,10,stage.stageWidth-20,(stage.stageHeight/2)-20,30);
+      this.graphics.endFill();
+      
+      var cls:LabelButton = new LabelButton();
+      cls.label = "ADD";
+      cls.width = 250;
+      cls.height = 80;
+      cls.x = (stage.stageWidth - 550) / 2;
+      cls.y = this.height-100;
+      cls.addEventListener(MouseEvent.CLICK,add);
+      addChild(cls);
+      
+      var cncl:LabelButton = new LabelButton();
+      cncl.label = "CANCEL";
+      cncl.width = 250;
+      cncl.height = 80;
+      cncl.x = cls.x+300;
+      cncl.y = this.height-100;
+      cncl.addEventListener(MouseEvent.CLICK,cancel);
+      addChild(cncl);
+      
+      var profile:Container = new Container();
+      profile.height = this.height-125;
+      profile.width = this.width-30;      
+      profile.y = 15;
+      profile.x = 15;
+      addChild(profile);
+              
+      var icnWdth:Number = (this.width-40)/4;
+      
+      _pic1 = new Resources.FFVII;
+      _pic1.bitmapData = ImageResizer.bilinearIterative(_pic1.bitmapData,icnWdth-10,150,ResizeMath.METHOD_PAN_AND_SCAN);
+      _pic1.x = 5;
+      _pic1.y = 15;
+      profile.addChild(_pic1);
+      
+      _pic2 = new Resources.ZELDA;
+      _pic2.bitmapData = ImageResizer.bilinearIterative(_pic2.bitmapData,icnWdth-10,150,ResizeMath.METHOD_PAN_AND_SCAN);
+      _pic2.x = (icnWdth)+5;
+      _pic2.y = 15;
+      profile.addChild(_pic2);
+      
+      _pic3 = new Resources.HALO;
+      _pic3.bitmapData = ImageResizer.bilinearIterative(_pic3.bitmapData,icnWdth-10,150,ResizeMath.METHOD_PAN_AND_SCAN);
+      _pic3.x = (icnWdth*2)+5;;
+      _pic3.y = 15;
+      profile.addChild(_pic3);
+      
+      choice = new SegmentedControl();
+      choice.width = this.width-40;
+      choice.height = 80;
+      choice.x = 5;
+      choice.y = 175;
+      choice.addItem( {label: "Icon 1"} );
+      choice.addItem( {label: "Icon 2"} );
+      choice.addItem( {label: "Icon 3"} );
+      choice.addItem( {label: "No Icon"} );
+      choice.selectedIndex = 3;
+      profile.addChild(choice);
+      
+      txtMsg = new TextArea();
+      txtMsg.x = 0;
+      txtMsg.y = 265;
+      txtMsg.width = this.width - 30;
+      txtMsg.height = 120;
+      txtMsg.maxLines = 3;
+      txtMsg.maxChars = 160;
+      txtMsg.text = "";
+      txtMsg.prompt = "Profile Box Text";
+      profile.addChild(txtMsg);
+      
+      cookieMsg = new TextArea();
+      cookieMsg.x = 0;
+      cookieMsg.y = 395;
+      cookieMsg.width = this.width - 30;
+      cookieMsg.height = 120;
+      cookieMsg.maxLines = 3;
+      cookieMsg.maxChars = 160;
+      cookieMsg.text = "";
+      cookieMsg.prompt = "Profile Box Cookie";
+      profile.addChild(cookieMsg);
+      
+      this.y = stage.stageHeight/4;      
+   }
+   
+   private function cleanup(e:Event):void {
+         
+   }
+   
+   private function cancel(e:MouseEvent):void {                       
+      stage.removeChild(this);
+   }
+   
+   private function add(e:MouseEvent):void {
+      if( choice.selectedIndex == 0 ){
+         _bbm.bbmspUserProfileBox.addItem(txtMsg.text,cookieMsg.text);
+      } else
+      if( choice.selectedIndex == 1 ){
+         _bbm.bbmspUserProfileBox.addItem(txtMsg.text,cookieMsg.text);
+      } else
+      if( choice.selectedIndex == 2 ){
+         _bbm.bbmspUserProfileBox.addItem(txtMsg.text,cookieMsg.text);
+      } else
+      if( choice.selectedIndex == 3 ){
+         _bbm.bbmspUserProfileBox.addItem(txtMsg.text,cookieMsg.text);
+      }
+      stage.removeChild(this);
    }
 }
 

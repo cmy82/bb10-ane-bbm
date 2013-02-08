@@ -307,6 +307,7 @@ static void* initAneThread(void *data){
                     bps_event_payload_t payload;
 
                     bbmsp_user_profile_box_item_t *added, *added_copy;
+                    bbmsp_user_profile_box_item_create(&added);
                     bbmsp_user_profile_box_item_create(&added_copy);
                     bbmsp_event_user_profile_box_item_added_get_item(bbmspEvent,added);
                     bbmsp_user_profile_box_item_copy(added_copy,added);
@@ -324,6 +325,7 @@ static void* initAneThread(void *data){
                     bps_event_payload_t payload;
 
                     bbmsp_user_profile_box_item_t *removed, *removed_copy;
+                    bbmsp_user_profile_box_item_create(&removed);
                     bbmsp_user_profile_box_item_create(&removed_copy);
                     bbmsp_event_user_profile_box_item_removed_get_item(bbmspEvent,removed);
                     bbmsp_user_profile_box_item_copy(removed_copy,removed);
@@ -507,6 +509,17 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                    "bbm_ane_bbmsp_profile_set_personal_message",
                                    "bbm_ane_bbmsp_set_user_profile_personal_message",
                                    "bbm_ane_bbmsp_set_user_profile_status",
+                                   //PROFILE BOX
+                                   "bbm_ane_bbmsp_user_profile_box_item_get_item_id",
+                                   "bbm_ane_bbmsp_user_profile_box_item_get_cookie",
+                                   "bbm_ane_bbmsp_user_profile_box_item_get_text",
+                                   "bbm_ane_bbmsp_user_profile_box_item_get_icon_id",
+                                   "bbm_ane_bbmsp_user_profile_box_add_item",
+                                   "bbm_ane_bbmsp_user_profile_box_items_size",
+                                   "bbm_ane_bbmsp_user_profile_box_itemlist_remove_at",
+                                   "bbm_ane_bbmsp_user_profile_box_remove_all_items",
+                                   "bbm_ane_bbmsp_user_profile_box_register_icon",
+                                   "bbm_ane_bbmsp_user_profile_box_retrieve_icon",
                                    NULL };
 	FREFunction functionPtrs[] = { checkStatus,
 	                               bbm_ane_startRegistration,
@@ -538,6 +551,16 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                   bbm_ane_bbmsp_profile_set_personal_message,
                                   bbm_ane_bbmsp_set_user_profile_personal_message,
                                   bbm_ane_bbmsp_set_user_profile_status,
+                                  bbm_ane_bbmsp_user_profile_box_item_get_item_id,
+                                  bbm_ane_bbmsp_user_profile_box_item_get_cookie,
+                                  bbm_ane_bbmsp_user_profile_box_item_get_text,
+                                  bbm_ane_bbmsp_user_profile_box_item_get_icon_id,
+                                  bbm_ane_bbmsp_user_profile_box_add_item,
+                                  bbm_ane_bbmsp_user_profile_box_items_size,
+                                  bbm_ane_bbmsp_user_profile_box_itemlist_remove_at,
+                                  bbm_ane_bbmsp_user_profile_box_remove_all_items,
+                                  bbm_ane_bbmsp_user_profile_box_register_icon,
+                                  bbm_ane_bbmsp_user_profile_box_retrieve_icon,
                                   NULL };
 
 	// count number of functions
@@ -547,9 +570,9 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
 	}
 
 	FRENamedFunction *functionSet = (FRENamedFunction *)calloc(*numFunctionsToSet,
-			sizeof(FRENamedFunction));
+		                                                        sizeof(FRENamedFunction));
 
-	for (i = 0; i < *numFunctionsToSet; i++) {
+	for (uint32_t i = 0; i < *numFunctionsToSet; i++) {
 		int bufferSize = sizeof(char) * (strlen(functionNames[i]) + 1);
 		temp = (char*) malloc(bufferSize);
 		strncpy(temp, functionNames[i], bufferSize);
@@ -570,6 +593,8 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
  *             The FREContext variable that represents this extension context.
  */
 void BBMANEContextFinalizer(FREContext ctx) { }
+
+
 
 #ifdef __cplusplus
 }

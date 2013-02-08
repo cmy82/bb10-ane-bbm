@@ -229,7 +229,7 @@ FREObject bbm_ane_bbmsp_user_profile_box_register_icon(FREContext ctx, void* fun
 */
 //BBMSP_API bbmsp_result_t bbmsp_user_profile_box_retrieve_icon(const int32_t icon_id);
 FREObject bbm_ane_bbmsp_user_profile_box_retrieve_icon(FREContext ctx, void* functionData,
-                                                       int32_t argc, FREObject argv[]);
+                                                       uint32_t argc, FREObject argv[]);
 
 
 
