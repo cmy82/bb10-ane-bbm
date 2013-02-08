@@ -45,7 +45,7 @@ typedef enum {
 //======================================================================================//
 
 void* initProfileBoxThread(void *data);
-static void notifyProfileBoxChanged(char *event);
+static void notifyProfileBoxChanged(char *event, int data);
 
 
 //======================================================================================//

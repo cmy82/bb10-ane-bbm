@@ -51,11 +51,9 @@ void* initProfileThread(void *data){
          case PROFILE_THREAD_INITIALIZING:
          {
             //Get next BPS event and block until one returns
-            cout << "Waiting on BPS event in profile thread" << endl;
             bps_get_event(&bps_event, -1);
             //If no BPS event is returned (ex if init failed) then cancel the event query
             if (!bps_event) return NULL;
-            cout << "BPS event received in profile thread" << endl;
 
             int eventDomain;
             int eventCode;
@@ -65,7 +63,6 @@ void* initProfileThread(void *data){
                eventCode = bps_event_get_code(bps_event);
                if( eventCode == START_LOADING_PROFILE ){
                   profileThreadStatus = PROFILE_THREAD_STARTING;
-                  cout << "Starting loading of profile" << endl;
                }
             }
          }
@@ -81,7 +78,6 @@ void* initProfileThread(void *data){
             if( bbmsp_get_user_profile(userProfile) != BBMSP_FAILURE ){
                profileThreadStatus = LOADED_PROFILE;
                notifyProfileChanged("ANEProfileLoaded");
-               cout << "Loaded user profile" << endl;
             } else
                sleep(30);
             break;
@@ -92,18 +88,15 @@ void* initProfileThread(void *data){
             if( bbmsp_get_user_profile(userProfile) != BBMSP_FAILURE ){
                profileThreadStatus = LOADED_PROFILE;
                notifyProfileChanged("ANEProfileUpdated");
-               cout << "Reloaded user profile" << endl;
             }
             break;
 
          case LOADED_PROFILE:
          {
             //Get next BPS event and block until one returns
-            cout << "Waiting on BPS event in profile thread" << endl;
             bps_get_event(&bps_event, -1);
             //If no BPS event is returned (ex if init failed) then cancel the event query
             if (!bps_event) return NULL;
-            cout << "BPS event received in profile thread" << endl;
 
             int eventDomain;
             int eventCode;
@@ -113,16 +106,12 @@ void* initProfileThread(void *data){
             if( eventDomain == ane_profile_domain ){
                eventCode = bps_event_get_code(bps_event);
                if( eventCode == PROFILE_CHANGED_RELOAD ){
-                  cout << "Profile event changed code received" << endl;
                   bps_event_payload_t *payload = bps_event_get_payload(bps_event);
                   bbmsp_profile_t *updated = (bbmsp_profile_t*)payload->data1;
-                  if( updated != NULL ) cout << "Profile retrieved from event" << endl;
                   bbmsp_presence_update_types_t *presence = (bbmsp_presence_update_types_t*)payload->data2;
-                  if( presence != NULL ) cout << "Profile presence status retrieved from event" << endl;
 
                   //If the user display picture changed then need to reload and insert in image map
                   if( (*presence & BBMSP_DISPLAY_PICTURE) == BBMSP_DISPLAY_PICTURE ){
-                     cout << "User profile picture was changed, reload" << endl;
                      pthread_mutex_lock(&profileMutex);
                      userProfilePicChanged = 1;
                      pthread_mutex_unlock(&profileMutex);

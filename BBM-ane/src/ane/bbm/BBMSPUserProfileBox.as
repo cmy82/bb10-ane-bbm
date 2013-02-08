@@ -40,6 +40,14 @@ package ane.bbm {
             dispatchEvent( new ANEUserProfileBoxEvent(ANEUserProfileBoxEvent.PROFILE_BOX_LOADED) );            
          } else if(e.code == ANEUserProfileBoxEvent.PROFILE_BOX_UPDATED){
             dispatchEvent( new ANEUserProfileBoxEvent(ANEUserProfileBoxEvent.PROFILE_BOX_UPDATED) );
+         } else if(e.code == ANEUserProfileBoxEvent.PROFILE_BOX_ITM_ADD){
+            dispatchEvent( new ANEUserProfileBoxEvent(ANEUserProfileBoxEvent.PROFILE_BOX_ITM_ADD) );
+         } else if(e.code == ANEUserProfileBoxEvent.PROFILE_BOX_ITM_DEL){
+            dispatchEvent( new ANEUserProfileBoxEvent(ANEUserProfileBoxEvent.PROFILE_BOX_ITM_DEL) );
+         } else if(e.code == ANEUserProfileBoxEvent.PROFILE_BOX_ICN_REG){
+            dispatchEvent( new ANEUserProfileBoxEvent(ANEUserProfileBoxEvent.PROFILE_BOX_ICN_REG) );
+         } else if(e.code == ANEUserProfileBoxEvent.PROFILE_BOX_ICN_RET){
+            dispatchEvent( new ANEUserProfileBoxEvent(ANEUserProfileBoxEvent.PROFILE_BOX_ICN_RET) );
          }
       }
    }

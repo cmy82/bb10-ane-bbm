@@ -1,31 +1,19 @@
 err: config: Failed to open file (/etc/system/config/qnxair_variant.conf): No such file or directory	(tid:1)
 Request to receive BBMSP events successful for ANE thread [4]
-Waiting on BPS event in profile thread
-Waiting on BPS event in ANE thread
-BPS Event received in ANE thread
 Waiting on BPS event in ANE thread
 Waiting on BPS event in profile box thread
 BPS Event received in ANE thread
+Waiting on BPS event in ANE thread
+BPS Event received in ANE thread
 BBMSP event received in ANE thread
 Waiting on BPS event in ANE thread
 BPS Event received in ANE thread
 BBMSP event received in ANE thread
 Waiting on BPS event in ANE thread
-About to call bbmsp_contact_list_get
-Called bbmsp_contact_list_get
-Waiting on contact list to be populated
-BPS Event received in ContactList thread
-Contact list event
-Contact list ready to be retrieved
-Retrieved 0 contacts
 BPS Event received in ANE thread
 Custom event for registration status received in ANE thread
-BPS event received in profile thread
 BPS event received in profile box thread
-Starting loading of profile
 Starting loading of profile box
-Loaded user profile
-Waiting on BPS event in profile thread
 Loaded user profile box
 Waiting on BPS event in profile box thread
 getting user profile picture 
@@ -33,39 +21,24 @@ did user change picture: 0
 was profile pictured changed: 1
 getting profile picture and a copy since the picture is not yet cached
 was able to get and create images
-size of profile picture: 5251
+size of profile picture: 4670
 creating struct to hold images and inserting into map cache
 pushed images into the map
 
-====== Adding profile box item ======
-hhhhgftygfdfgv:hhhhgftygfdfgv
-fgbvvgfcggtyhgftffhjfvff:fgbvvgfcggtyhgftffhjfvff
-Icon: -1
+loading from data ==========
+size: 172x150
 
-============BBMSP Profile Box Item Added Event Received===========
-BPS event received in profile box thread
-Loaded user profile box
-Waiting on BPS event in profile box thread
 
-====== Adding profile box item ======
-bbhhgbhhbh:bbhhgbhhbh
-vgffghghhhvfggf:vgffghghhhvfggf
-Icon: -1
+loading from data ==========
+size: 172x150
 
-============BBMSP Profile Box Item Added Event Received===========
-BPS event received in profile box thread
-Loaded user profile box
-Waiting on BPS event in profile box thread
 
-====== Adding profile box item ======
-gyyhghhgh:gyyhghhgh
-vhjghhchhfyhvghhgyhggubvjh:vhjghhchhfyhvghhgyhggubvjh
-Icon: -1
+loading from data ==========
+size: 172x150
 
-============BBMSP Profile Box Item Added Event Received===========
-BPS event received in profile box thread
-Loaded user profile box
-Waiting on BPS event in profile box thread
-============BBMSP Profile Box Item Removed Event Received===========
-
-Process 345047235 (adl) terminated SIGSEGV code=1 fltno=11 ip=79070c34(/base/usr/lib/libbbmsp.so.1@bbmsp_event_user_profile_box_item_removed_get_item+0x67) mapaddr=00030c34. ref=00000000 bdslot=1
+no errors creating temp file for avatar
+returning from call
+no errors creating temp file for avatar
+returning from call
+no errors creating temp file for avatar
+returning from call

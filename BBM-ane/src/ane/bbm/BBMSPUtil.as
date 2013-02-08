@@ -13,6 +13,7 @@ package ane.bbm {
    import flash.filesystem.File;
    import flash.filesystem.FileMode;
    import flash.filesystem.FileStream;
+   import flash.geom.Rectangle;
    import flash.net.FileFilter;
    import flash.utils.ByteArray;
    
@@ -81,6 +82,23 @@ package ane.bbm {
          dir.addEventListener(Event.SELECT,imageSelected);
          dir.addEventListener(Event.CANCEL,loadCanceled);
          dir.browseForOpen("Choose Image",[imgFilter]);
+      }
+      
+      
+      public function loadImageFromBitmap(name:String,img:Bitmap):void {
+         var rect:Rectangle = new Rectangle(0,0,img.width,img.height);
+         var data:ByteArray = img.bitmapData.getPixels(rect);
+         
+         trace("trying to load from bitmap with a size of "+img.width+"x"+img.height);
+         if( search(name) == false ){            
+            var result:Object = 
+               this._context.call( "bbm_ane_bbmsp_image_create_from_data", data.length, data, img.width, img.height );
+            var image:ImageTracker = new ImageTracker(name,Number(result));
+            _imageList.push(image);
+         } else {
+            var image2:ImageTracker = findByName(name);
+            dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_LOADED,image2.id,name) );            
+         }
       }
       
       private function loadCanceled(e:Event):void {
@@ -153,6 +171,11 @@ package ane.bbm {
       private function imageStatusUpdate(e:StatusEvent):void {
          if(e.code == ANEImageEvent.IMAGE_LOADED ){
             var id:Number = Number(e.level);
+            var tracker:ImageTracker = findByID(id);
+            if( tracker == null ){
+               trace("ID: "+id+" not found");
+               return;
+            }
             var file:String = findByID(id).name;
             dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_LOADED,id,file) );            
          }
@@ -182,7 +205,7 @@ package ane.bbm {
       }
       
       private function findByID(id:Number):ImageTracker {
-         var found:ImageTracker;
+         var found:ImageTracker = null;
          for( var i:int = 0; i<_imageList.length; i++ ){
             if( _imageList[i].id == id ){
                found = _imageList[i];

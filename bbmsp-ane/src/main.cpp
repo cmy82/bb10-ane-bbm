@@ -174,8 +174,6 @@ static void* initAneThread(void *data){
    // a different result. Check that you are using the BlackBerry Messenger
    // permission in your bar-descriptor.xml file.
    if (bbmsp_request_events(0) == BBMSP_FAILURE) return NULL;
-   cout << "Request to receive BBMSP events successful for ANE thread [" <<
-         ane_master_channel_id << "]" << endl;
 
    bps_event_t   *event;
    bbmsp_event_t *bbmspEvent;
@@ -201,16 +199,11 @@ static void* initAneThread(void *data){
               int eventDomain;
               int eventCode;
 
-              cout << "Waiting on BPS event in ANE thread" << endl;
               bps_get_event(&event, -1);
               eventDomain = bps_event_get_domain(event);
 
-              cout << "BPS Event received in ANE thread" << endl;
-
               if (bps_event_get_domain(event) == bbmsp_get_domain()) {
                  bbmsp_event_t *bbmsp_event;
-
-                 cout << "BBMSP event received in ANE thread" << endl;
 
                  // Handle a BBM Social Platform event.
                  int event_category = 0;
@@ -234,7 +227,6 @@ static void* initAneThread(void *data){
               //Only check for event passed to the ANEs domain
               if( eventDomain == ane_master_domain ){
                  eventCode = bps_event_get_code(event);
-                 cout << "Custom event for registration status received in ANE thread" << endl;
                  //Check to see which code was passed
                  switch(eventCode){
                     case ANE_REGISTERED:
@@ -317,6 +309,9 @@ static void* initAneThread(void *data){
                     bps_event_create(&aneProfileBoxEvent, ane_profile_box_domain,
                                      PROFILE_BOX_CHANGED_ADD, &payload, &bpsEventComplete);
                     bps_channel_push_event(ane_profile_box_channel_id, aneProfileBoxEvent);
+
+                    //bbmsp_user_profile_box_item_destroy(&added);
+                    bbmsp_user_profile_box_item_destroy(&added_copy);
                  }
 
                  if( eventType == BBMSP_SP_EVENT_USER_PROFILE_BOX_ITEM_REMOVED ){
@@ -335,6 +330,9 @@ static void* initAneThread(void *data){
                     bps_event_create(&aneProfileBoxEvent, ane_profile_box_domain,
                                      PROFILE_BOX_CHANGED_DEL, &payload, &bpsEventComplete);
                     bps_channel_push_event(ane_profile_box_channel_id, aneProfileBoxEvent);
+
+                    //bbmsp_user_profile_box_item_destroy(&removed);
+                    bbmsp_user_profile_box_item_destroy(&removed_copy);
                  }
 
                  if( eventType == BBMSP_SP_EVENT_USER_PROFILE_BOX_ICON_ADDED ){
@@ -483,6 +481,7 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
 	                                "bbm_ane_bbmsp_send_download_invitation",
 	                                //IMAGES
 	                                "bbm_ane_bbmsp_image_create",
+	                                "bbm_ane_bbmsp_image_create_from_data",
 	                                "bbm_ane_bbmsp_image_destroy",
                                    "bbm_ane_bbmsp_image_get_type",
                                    "bbm_ane_bbmsp_image_get_data",
@@ -527,6 +526,7 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                   bbm_ane_bbmsp_get_domain,
                                   bbm_ane_bbmsp_send_download_invitation,
                                   bbm_ane_bbmsp_image_create,
+                                  bbm_ane_bbmsp_image_create_from_data,
 	                               bbm_ane_bbmsp_image_destroy,
                                   bbm_ane_bbmsp_image_get_type,
                                   bbm_ane_bbmsp_image_get_data,

@@ -473,6 +473,10 @@ class ProfileBoxCard extends Sprite {
       profile.addChild(cookieMsg);
       
       this.y = stage.stageHeight/4;      
+      
+      _bbm.bbmspImages.loadImageFromBitmap("FFVII",_pic1);
+      _bbm.bbmspImages.loadImageFromBitmap("ZELDA",_pic2);
+      _bbm.bbmspImages.loadImageFromBitmap("HALO",_pic3);
    }
    
    private function cleanup(e:Event):void {

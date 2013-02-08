@@ -84,7 +84,7 @@ void* initProfileBoxThread(void *data){
 
             if( bbmsp_user_profile_box_get_items(profileBoxList) != BBMSP_FAILURE ){
                profileBoxThreadStatus = PROFILE_BOX_LOADED;
-               notifyProfileBoxChanged("ANEProfileBoxLoaded");
+               notifyProfileBoxChanged("ANEProfileBoxLoaded",0);
                cout << "Loaded user profile box" << endl;
             } else
                sleep(30);
@@ -103,14 +103,24 @@ void* initProfileBoxThread(void *data){
             eventDomain = bps_event_get_domain(bps_event);
             if( eventDomain == ane_profile_box_domain ){
                eventCode = bps_event_get_code(bps_event);
-               if( (eventCode == PROFILE_BOX_CHANGED_ADD) || (eventCode == PROFILE_BOX_CHANGED_DEL) ){
+               if( (eventCode == PROFILE_BOX_CHANGED_ADD) ){
                   //If item is added or removed then reload the list
                   profileBoxThreadStatus = PBOX_THREAD_STARTING;
+                  notifyProfileBoxChanged("ANEProfileBoxItemAdded",0);
+                  break;
+               }
+
+               if( (eventCode == PROFILE_BOX_CHANGED_DEL) ){
+                  //If item is added or removed then reload the list
+                  profileBoxThreadStatus = PBOX_THREAD_STARTING;
+                  notifyProfileBoxChanged("ANEProfileBoxItemDeleted",0);
                   break;
                }
 
                if( eventCode == PROFILE_BOX_CHANGED_ICN_ADD ){
-
+                  bps_event_payload_t *payload = bps_event_get_payload(bps_event);
+                  int32_t iconID = (int32_t)payload->data1;
+                  notifyProfileBoxChanged("ANEProfileBoxIconRegistered",iconID);
                }
 
                if( eventCode == PROFILE_BOX_CHANGED_ICN_RET ){
@@ -122,6 +132,7 @@ void* initProfileBoxThread(void *data){
                      ane_image_s *images = it->second;
                      if( images->iconID == iconID ){
                         found = true;
+                        notifyProfileBoxChanged("ANEProfileBoxIconRetrieved",iconID);
                         break;
                      }
                   }
@@ -133,6 +144,7 @@ void* initProfileBoxThread(void *data){
                      images->original = (bbmsp_image_t*)payload->data2;
                      images->profile  = (bbmsp_image_t*)payload->data2;
                      ane_image_map->insert( std::pair<int,ane_image_s*>(id,images) );
+                     notifyProfileBoxChanged("ANEProfileBoxIconRetrieved",id);
                   }
                }
             }
@@ -151,8 +163,11 @@ void* initProfileBoxThread(void *data){
    return NULL;
 }
 
-static void notifyProfileBoxChanged(char *event){
-
+static void notifyProfileBoxChanged(char *event,int value){
+   const char *lvl = "";
+   char data[15];
+   itoa(value,data,10);
+   FREDispatchStatusEventAsync(currentContext, (const uint8_t*)event, (const uint8_t*)data);
 }
 
 //======================================================================================//

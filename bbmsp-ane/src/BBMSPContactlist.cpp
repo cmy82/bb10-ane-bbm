@@ -70,22 +70,18 @@ void* initContactThread(void *data){
             //to be populated.
             if( bbmsp_event_contact_list_register_event() != BBMSP_FAILURE ){
                contactThreadStatus = CONTACT_THREAD_STARTING;
-               cout << "About to call bbmsp_contact_list_get" << endl;
                if( bbmsp_contact_list_get() == BBMSP_FAILURE )
                   contactThreadStatus = CONTACT_THREAD_STOPPING;
-               cout << "Called bbmsp_contact_list_get" << endl;
             }
             sleep(15);
             break;
 
          case CONTACT_THREAD_STARTING:
          {
-            cout << "Waiting on contact list to be populated" <<endl;
             //Waiting on contact list to be populated. Thread can move into this state at any time.
             bps_get_event(&bps_event, -1);
             if (!bps_event) return NULL;
 
-            cout << "BPS Event received in ContactList thread" <<endl;
             int eventCategory = 0;
             int eventType = 0;
 
@@ -94,11 +90,8 @@ void* initContactThread(void *data){
             bbmsp_event_get(bps_event, &bbmspEvent);
 
             if( eventCategory == BBMSP_CONTACT_LIST ){
-                cout << "Contact list event" << endl;
                 if(eventType == BBMSP_SP_EVENT_CONTACT_LIST_FULL) {
-                   cout << "Contact list ready to be retrieved" << endl;
                    bbmsp_event_contact_list_get_full_contact_list(bbmspEvent,&contactList);
-                   cout << "Retrieved " << bbmsp_contact_list_get_size(contactList) << " contacts" << endl;
                    contactThreadStatus = WAITING_ON_CONTACT;
                    notifyContactListLoaded();
                 }

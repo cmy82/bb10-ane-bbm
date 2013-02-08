@@ -29,6 +29,8 @@ typedef struct {
    int32_t  type;
    uint32_t size;
    uint32_t id;
+   uint32_t width;
+   uint32_t height;
    char     *data;
 } image_data_s;
 
@@ -89,10 +91,11 @@ void* initImageThread(void *data){
             //structs (<32k)
             QString fileExtension;
             switch(imageData->type){
-               case 0: fileExtension.append("jpg"); break;
-               case 1: fileExtension.append("png"); break;
-               case 2: fileExtension.append("gif"); break;
-               case 3: fileExtension.append("bmp"); break;
+               case -1: fileExtension.append("jpg"); break;
+               case 0:  fileExtension.append("jpg"); break;
+               case 1:  fileExtension.append("png"); break;
+               case 2:  fileExtension.append("gif"); break;
+               case 3:  fileExtension.append("bmp"); break;
             }
 
             QString tempAvatar = QString("/accounts/1000/shared/photos");
@@ -107,7 +110,20 @@ void* initImageThread(void *data){
             int maxWidth = 300;
             int maxHeight = 300;
 
-            image.loadFromData((uchar *)imageData->data,(int)imageData->size,0);
+            if( imageData->type != -1 ){
+               cout << "Image was loaded from a file" << endl;
+               image.loadFromData((uchar *)imageData->data,(int)imageData->size,0);
+            }else{
+               QImage temp(imageData->width, imageData->height, QImage::Format_ARGB32);
+               for(int y(0); y<imageData->height; ++y){
+                  for(int x(0); x<imageData->width; ++x){
+                     int index(y*(imageData->width) + x);
+                     temp.setPixel(x, y, imageData->data[index]);
+                  }
+               }
+               image = temp.copy(0,0,imageData->width,imageData->height);
+            }
+
             image = image.convertToFormat(QImage::Format_ARGB4444_Premultiplied);
             scaled = image.scaled(maxWidth,maxHeight,Qt::KeepAspectRatio);
             while( scaled.byteCount() > 32768 ){
@@ -115,7 +131,7 @@ void* initImageThread(void *data){
                maxWidth-=10;
                maxHeight-=10;
                scaled = image.scaled(maxWidth,maxHeight,Qt::KeepAspectRatio);
-               cout << "image was too large and had to be scaled: " << maxWidth << "x" << maxHeight << endl;
+               //cout << "image was too large and had to be scaled: " << maxWidth << "x" << maxHeight << endl;
             }
             scaled.save(tempAvatar);
 
@@ -144,13 +160,34 @@ void* initImageThread(void *data){
             ane_image_s *images = (ane_image_s*)malloc(sizeof(ane_image_s));
 
             if( !errored ){
-               bbmsp_image_create(&bbmspAvatar,(bbmsp_image_type_t)imageData->type,imageDataAry.data(), imageDataAry.size());
-               bbmsp_image_create(&bbmspImage,(bbmsp_image_type_t)imageData->type,imageData->data,imageData->size);
+               cout << "no errors creating temp file for avatar" << endl;
+               if( imageData->type != -1 ){
+                  bbmsp_image_create(&bbmspAvatar,(bbmsp_image_type_t)imageData->type,imageDataAry.data(),imageDataAry.size());
+                  bbmsp_image_create(&bbmspImage,(bbmsp_image_type_t)imageData->type,imageData->data,imageData->size);
+               } else {
+                  cout << "data was not loaded from a file" << endl;
+                  bbmsp_image_create(&bbmspAvatar,BBMSP_IMAGE_TYPE_JPG,imageDataAry.data(),imageDataAry.size());
+                  bbmsp_image_create(&bbmspImage,BBMSP_IMAGE_TYPE_JPG,imageDataAry.data(),imageDataAry.size());
+               }
 
                images->original = bbmspImage;
                images->profile = bbmspAvatar;
             } else {
-               bbmsp_image_create(&bbmspImage,(bbmsp_image_type_t)imageData->type,imageData->data,imageData->size);
+               if( imageData->type != -1 )
+                  bbmsp_image_create(&bbmspImage,(bbmsp_image_type_t)imageData->type,imageData->data,imageData->size);
+               else {
+                  delete imageData->data;
+                  free(imageData);
+
+                  pthread_mutex_lock(&imageMutex);
+                  queueEmpty = imageQueue.empty();
+                  pthread_mutex_unlock(&imageMutex);
+
+                  if( queueEmpty ){
+                     imageThreadStatus = WAITING_ON_IMAGE;
+                  }
+                  break;
+               }
 
                images->original = bbmspImage;
                images->profile = NULL;
@@ -228,7 +265,10 @@ FREObject bbm_ane_bbmsp_image_create(FREContext ctx, void* functionData,
    const uint8_t *extension;
    uint32_t      extLength = 5;
 
-   imageData = (image_data_s *)malloc( sizeof(image_data_s) );
+   cout << "[bbmsputil - image_create] creating loaded image file with id of " << id << endl;
+   imageData = (image_data_s*)malloc( sizeof(image_data_s) );
+   imageData->id = id;
+
    FREGetObjectAsUTF8(argv[0],&extLength,&extension);
    if( strcmp((const char*)extension,"JPG") == 0 )  imageData->type = BBMSP_IMAGE_TYPE_JPG;
    if( strcmp((const char*)extension,"JPEG") == 0 ) imageData->type = BBMSP_IMAGE_TYPE_JPG;
@@ -237,7 +277,6 @@ FREObject bbm_ane_bbmsp_image_create(FREContext ctx, void* functionData,
    if( strcmp((const char*)extension,"BMP") == 0 )  imageData->type = BBMSP_IMAGE_TYPE_BMP;
 
    FREGetObjectAsUint32(argv[1],&(imageData->size));
-   imageData->id = id;
 
    FREAcquireByteArray(argv[2],&imageBytes);
    imageData->data = new char[imageData->size];
@@ -245,6 +284,41 @@ FREObject bbm_ane_bbmsp_image_create(FREContext ctx, void* functionData,
       imageData->data[i] = imageBytes.bytes[i];
    }
    FREReleaseByteArray(argv[2]);
+
+   pthread_mutex_lock(&imageMutex);
+   imageQueue.push(imageData);
+   pthread_mutex_unlock(&imageMutex);
+
+   FREObject result;
+   FRENewObjectFromUint32(id, &result);
+   return result;
+}
+
+FREObject bbm_ane_bbmsp_image_create_from_data(FREContext ctx, void* functionData,
+                                               uint32_t argc, FREObject argv[]){
+   uint32_t      id = rand();
+   image_data_s  *imageData;
+   bbmsp_image_t *image;
+   FREByteArray  imageBytes;
+
+   imageData = (image_data_s*)malloc( sizeof(image_data_s) );
+
+   FREGetObjectAsUint32(argv[0],&(imageData->size));
+   imageData->id = id;
+   imageData->type = -1;
+   FREGetObjectAsUint32(argv[2],&(imageData->width));
+   FREGetObjectAsUint32(argv[3],&(imageData->height));
+   imageData->id = id;
+
+   cout << endl << "loading from data ==========" << endl;
+   cout << "size: " << imageData->width << "x" << imageData->height << endl << endl;
+
+   FREAcquireByteArray(argv[1],&imageBytes);
+   imageData->data = new char[imageData->size];
+   for(uint32_t i=0; i<imageData->size; ++i){
+      imageData->data[i] = imageBytes.bytes[i];
+   }
+   FREReleaseByteArray(argv[1]);
 
    pthread_mutex_lock(&imageMutex);
    imageQueue.push(imageData);

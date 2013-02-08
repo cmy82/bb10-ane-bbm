@@ -73,6 +73,8 @@ FREObject bbm_ane_image_exists(FREContext ctx, void* functionData,
 FREObject bbm_ane_bbmsp_image_create(FREContext ctx, void* functionData,
                                      uint32_t argc, FREObject argv[]);
 
+FREObject bbm_ane_bbmsp_image_create_from_data(FREContext ctx, void* functionData,
+                                               uint32_t argc, FREObject argv[]);
 
 /**
  * @brief Destroys a created @c bbmsp_image_t image.
