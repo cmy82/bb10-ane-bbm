@@ -30,8 +30,20 @@ package ane.bbm {
          trace("Calling add profile box item");
          trace(text);
          trace(cookie);
+         trace(icnID);
          var result:Object = _context.call( "bbm_ane_bbmsp_user_profile_box_add_item",icnID,text,text.length,cookie,cookie.length);
          trace("result: "+result.toString());
+      }
+      
+      public function registerIcon(imageID:Number,iconID:Number):void {
+         trace("registering icon "+imageID+" with id "+iconID);
+         var result:Object = _context.call( "bbm_ane_bbmsp_user_profile_box_register_icon", iconID, imageID );
+         trace("Result: "+result.toString());
+         if( Number(result) < 0 ){
+            result = _context.call( "bbm_ane_bbmsp_user_profile_box_retrieve_icon", iconID );
+            trace("Result: "+result.toString());
+            trace();
+         }
       }
       
       //======================================= MISCELLANEOUS FUNCTIONS =================================

@@ -24,8 +24,7 @@
       var usrTag:Label;
       var imgHolder:Sprite;
       var bbmExtension:BBMAne;   
-      var usrSelected:Boolean = false;
-      
+      private var profLoading:Boolean = true;      
       var imgId:int;
       
       private var uuid:String = "99b1d456-46e6-4f75-aca0-dacb4b878927"; //87-88-89-27
@@ -140,6 +139,7 @@
       public function testUUID(e:Event):void {         
          var out:Object = bbmExtension.checkStatus();
          testLbl.text = out.toString();
+         if( stage.numChildren == 1 ) profLoading = true;
       }
       
       public function callRegistration(e:MouseEvent):void {
@@ -151,7 +151,6 @@
       }
       
       public function callLoadImage(e:MouseEvent):void {
-         usrSelected = true;
          bbmExtension.bbmspImages.loadImage();
       }
       
@@ -161,16 +160,19 @@
       }
       
       public function displayProfileBox(e:MouseEvent):void {
+         profLoading = false;
          var profileBox:ProfileBoxCard = new ProfileBoxCard(bbmExtension);
          this.stage.addChild(profileBox);
       }
-      
+                
       private function retrieveImage(e:ANEImageEvent):void {
          trace("calling retrieve image for loaded profile image "+e.id);
-         //need to call function to get the profile image back and not the fullimage
-         var id:Number = e.id;
-         imgId = id;
-         bbmExtension.bbmspImages.retrieveImage(id);
+         if( profLoading ){            
+            //need to call function to get the profile image back and not the fullimage
+            var id:Number = e.id;
+            imgId = id;
+            bbmExtension.bbmspImages.retrieveImage(id);
+         }
       }
       
       private function displayImage(e:ANEImageEvent):void {
@@ -321,11 +323,15 @@ class ProfileCard extends Sprite {
       persMsg.prompt = "Personal Message";
       profile.addChild(persMsg);
       
+      
+      
       this.y = stage.stageHeight/4;      
    }
    
    private function cleanup(e:Event):void {
+      this.removeEventListener(Event.REMOVED_FROM_STAGE,cleanup);
       _bbm.bbmspImages.removeEventListener(ANEImageEvent.PROF_IMAGE_RETRIEVED,displayImage);   
+      _bbm.bbmspImages.removeEventListener(ANEImageEvent.IMAGE_LOADED,retrieveProfileImage);
    }
    
    private function closeProfile(e:MouseEvent):void {
@@ -362,7 +368,7 @@ class ProfileCard extends Sprite {
    private function retrieveProfileImage(e:ANEImageEvent):void {
       var id:Number = e.id;
       imgID = id;
-      _bbm.bbmspImages.retrieveProfileImage(id);
+      _bbm.bbmspImages.retrieveProfileImage(id);      
    }
 }
 
@@ -380,7 +386,7 @@ class ProfileBoxCard extends Sprite {
       _bbm = bbm;
       this.addEventListener(Event.ADDED_TO_STAGE,init);  
       this.addEventListener(Event.REMOVED_FROM_STAGE,cleanup);      
-      
+      _bbm.bbmspImages.addEventListener(ANEImageEvent.IMAGE_LOADED,registerIcon);
    }
    
    public function init(e:Event):void {
@@ -474,13 +480,23 @@ class ProfileBoxCard extends Sprite {
       
       this.y = stage.stageHeight/4;      
       
-      _bbm.bbmspImages.loadImageFromBitmap("FFVII",_pic1);
-      _bbm.bbmspImages.loadImageFromBitmap("ZELDA",_pic2);
-      _bbm.bbmspImages.loadImageFromBitmap("HALO",_pic3);
+      _bbm.bbmspImages.loadImageFromResource("ffvii_icon.jpg");
+      _bbm.bbmspImages.loadImageFromResource("zelda_icon.png");
+      _bbm.bbmspImages.loadImageFromResource("halo_icon.png");
    }
    
    private function cleanup(e:Event):void {
-         
+      _bbm.bbmspImages.removeEventListener(ANEImageEvent.IMAGE_LOADED,registerIcon);
+   }
+   
+   private function registerIcon(e:ANEImageEvent):void {
+      trace(e.filename);
+      if( e.filename == "ffvii_icon.jpg" )
+         _bbm.bbmspUserProfileBox.registerIcon(e.id,1001);
+      if( e.filename == "zelda_icon.png" )
+         _bbm.bbmspUserProfileBox.registerIcon(e.id,1002);
+      if( e.filename == "halo_icon.png" )
+         _bbm.bbmspUserProfileBox.registerIcon(e.id,1003);
    }
    
    private function cancel(e:MouseEvent):void {                       
@@ -489,13 +505,13 @@ class ProfileBoxCard extends Sprite {
    
    private function add(e:MouseEvent):void {
       if( choice.selectedIndex == 0 ){
-         _bbm.bbmspUserProfileBox.addItem(txtMsg.text,cookieMsg.text);
+         _bbm.bbmspUserProfileBox.addItem(txtMsg.text,cookieMsg.text,1001);
       } else
       if( choice.selectedIndex == 1 ){
-         _bbm.bbmspUserProfileBox.addItem(txtMsg.text,cookieMsg.text);
+         _bbm.bbmspUserProfileBox.addItem(txtMsg.text,cookieMsg.text,1002);
       } else
       if( choice.selectedIndex == 2 ){
-         _bbm.bbmspUserProfileBox.addItem(txtMsg.text,cookieMsg.text);
+         _bbm.bbmspUserProfileBox.addItem(txtMsg.text,cookieMsg.text,1003);
       } else
       if( choice.selectedIndex == 3 ){
          _bbm.bbmspUserProfileBox.addItem(txtMsg.text,cookieMsg.text);

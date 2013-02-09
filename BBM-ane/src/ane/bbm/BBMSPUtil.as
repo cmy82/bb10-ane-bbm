@@ -15,6 +15,7 @@ package ane.bbm {
    import flash.filesystem.FileStream;
    import flash.geom.Rectangle;
    import flash.net.FileFilter;
+   import flash.net.URLRequest;
    import flash.utils.ByteArray;
    
    public class BBMSPUtil extends EventDispatcher {
@@ -101,9 +102,27 @@ package ane.bbm {
          }
       }
       
-      private function loadCanceled(e:Event):void {
-         
+      public function loadImageFromResource(loc:String):void {
+        var rsrcFile:File = File.applicationDirectory.resolvePath(loc);
+        trace(rsrcFile.nativePath);
+        var rsrcStream:FileStream = new FileStream();
+        rsrcStream.open(rsrcFile,FileMode.READ);
+        var rsrcBytes:ByteArray = new ByteArray();
+        rsrcStream.readBytes(rsrcBytes);
+        rsrcStream.close();
+        
+        if( search(rsrcFile.name) == false ){
+           var result:Object = 
+              this._context.call( "bbm_ane_bbmsp_image_create", rsrcFile.extension.toUpperCase(), rsrcBytes.length, rsrcBytes );
+           var image:ImageTracker = new ImageTracker(rsrcFile.name,Number(result));
+           _imageList.push(image);
+        } else {
+           var image2:ImageTracker = findByName(rsrcFile.name);
+           dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_LOADED,image2.id,rsrcFile.name) );            
+        }
       }
+      
+      private function loadCanceled(e:Event):void { }
       
       private function imageSelected(e:Event):void {
          var imageFile:File = e.target as File;
@@ -123,7 +142,7 @@ package ane.bbm {
             dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_LOADED,image2.id,imageFile.name) );            
          }
       }
-           
+                
       //=============================== RETRIEVING FUNCTIONS ====================================
       public function retrieveImage(id:Number):void {
          var size:Object = this._context.call( "bbm_ane_bbmsp_image_get_data_size", id );

@@ -28,11 +28,6 @@ extern "C" {
 
 FREContext currentContext;
 
-int runCount = 0;
-int contextInit = 0;
-int extensionInit = 0;
-char * test;
-
 int ane_master_domain;           //Used to check the domain for events from the ANE
 int ane_master_channel_id = -1;  //Used so child channels can push events back to main channel
 
@@ -351,7 +346,7 @@ static void* initAneThread(void *data){
                  }
 
                  if( eventType == BBMSP_SP_EVENT_USER_PROFILE_BOX_ICON_RETRIEVED ){
-                    cout << "============BBMSP Profile Box Item Icon Added Event Received===========" << endl;
+                    cout << "============BBMSP Profile Box Item Icon Retrieved Event Received===========" << endl;
                     bps_event_t         *aneProfileBoxEvent;
                     bps_event_payload_t payload;
                     bbmsp_image_t       *icon;
@@ -481,7 +476,7 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
 	                                "bbm_ane_bbmsp_send_download_invitation",
 	                                //IMAGES
 	                                "bbm_ane_bbmsp_image_create",
-	                                "bbm_ane_bbmsp_image_create_from_data",
+	                                "bbm_ane_create_image_from_data",
 	                                "bbm_ane_bbmsp_image_destroy",
                                    "bbm_ane_bbmsp_image_get_type",
                                    "bbm_ane_bbmsp_image_get_data",
@@ -526,7 +521,7 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                   bbm_ane_bbmsp_get_domain,
                                   bbm_ane_bbmsp_send_download_invitation,
                                   bbm_ane_bbmsp_image_create,
-                                  bbm_ane_bbmsp_image_create_from_data,
+                                  bbm_ane_create_image_from_data,
 	                               bbm_ane_bbmsp_image_destroy,
                                   bbm_ane_bbmsp_image_get_type,
                                   bbm_ane_bbmsp_image_get_data,

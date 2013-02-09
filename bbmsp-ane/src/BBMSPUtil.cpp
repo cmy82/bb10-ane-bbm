@@ -238,8 +238,7 @@ static void notifyImageComplete(int id){
    FREDispatchStatusEventAsync(currentContext, (const uint8_t*)eventName, (const uint8_t*)imgID);
 }
 
-FREObject bbm_ane_image_exists(FREContext ctx, void* functionData,
-                                     uint32_t argc, FREObject argv[]){
+FREObject bbm_ane_image_exists(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]){
    int imageID;
    FREGetObjectAsInt32(argv[0],&imageID);
    ane_image_s *images = (ane_image_map->find(imageID))->second;
@@ -249,6 +248,40 @@ FREObject bbm_ane_image_exists(FREContext ctx, void* functionData,
 
    FREObject result;
    FRENewObjectFromUint32(code, &result);
+   return result;
+}
+
+FREObject bbm_ane_create_image_from_data(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]){
+   uint32_t      id = rand();
+   image_data_s  *imageData;
+   bbmsp_image_t *image;
+   FREByteArray  imageBytes;
+
+   imageData = (image_data_s*)malloc( sizeof(image_data_s) );
+
+   FREGetObjectAsUint32(argv[0],&(imageData->size));
+   imageData->id = id;
+   imageData->type = -1;
+   FREGetObjectAsUint32(argv[2],&(imageData->width));
+   FREGetObjectAsUint32(argv[3],&(imageData->height));
+   imageData->id = id;
+
+   cout << endl << "loading from data ==========" << endl;
+   cout << "size: " << imageData->width << "x" << imageData->height << endl << endl;
+
+   FREAcquireByteArray(argv[1],&imageBytes);
+   imageData->data = new char[imageData->size];
+   for(uint32_t i=0; i<imageData->size; ++i){
+      imageData->data[i] = imageBytes.bytes[i];
+   }
+   FREReleaseByteArray(argv[1]);
+
+   pthread_mutex_lock(&imageMutex);
+   imageQueue.push(imageData);
+   pthread_mutex_unlock(&imageMutex);
+
+   FREObject result;
+   FRENewObjectFromUint32(id, &result);
    return result;
 }
 
@@ -284,41 +317,6 @@ FREObject bbm_ane_bbmsp_image_create(FREContext ctx, void* functionData,
       imageData->data[i] = imageBytes.bytes[i];
    }
    FREReleaseByteArray(argv[2]);
-
-   pthread_mutex_lock(&imageMutex);
-   imageQueue.push(imageData);
-   pthread_mutex_unlock(&imageMutex);
-
-   FREObject result;
-   FRENewObjectFromUint32(id, &result);
-   return result;
-}
-
-FREObject bbm_ane_bbmsp_image_create_from_data(FREContext ctx, void* functionData,
-                                               uint32_t argc, FREObject argv[]){
-   uint32_t      id = rand();
-   image_data_s  *imageData;
-   bbmsp_image_t *image;
-   FREByteArray  imageBytes;
-
-   imageData = (image_data_s*)malloc( sizeof(image_data_s) );
-
-   FREGetObjectAsUint32(argv[0],&(imageData->size));
-   imageData->id = id;
-   imageData->type = -1;
-   FREGetObjectAsUint32(argv[2],&(imageData->width));
-   FREGetObjectAsUint32(argv[3],&(imageData->height));
-   imageData->id = id;
-
-   cout << endl << "loading from data ==========" << endl;
-   cout << "size: " << imageData->width << "x" << imageData->height << endl << endl;
-
-   FREAcquireByteArray(argv[1],&imageBytes);
-   imageData->data = new char[imageData->size];
-   for(uint32_t i=0; i<imageData->size; ++i){
-      imageData->data[i] = imageBytes.bytes[i];
-   }
-   FREReleaseByteArray(argv[1]);
 
    pthread_mutex_lock(&imageMutex);
    imageQueue.push(imageData);

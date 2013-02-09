@@ -1,17 +1,5 @@
 err: config: Failed to open file (/etc/system/config/qnxair_variant.conf): No such file or directory	(tid:1)
-Request to receive BBMSP events successful for ANE thread [4]
-Waiting on BPS event in ANE thread
 Waiting on BPS event in profile box thread
-BPS Event received in ANE thread
-Waiting on BPS event in ANE thread
-BPS Event received in ANE thread
-BBMSP event received in ANE thread
-Waiting on BPS event in ANE thread
-BPS Event received in ANE thread
-BBMSP event received in ANE thread
-Waiting on BPS event in ANE thread
-BPS Event received in ANE thread
-Custom event for registration status received in ANE thread
 BPS event received in profile box thread
 Starting loading of profile box
 Loaded user profile box
@@ -21,24 +9,18 @@ did user change picture: 0
 was profile pictured changed: 1
 getting profile picture and a copy since the picture is not yet cached
 was able to get and create images
-size of profile picture: 4670
+size of profile picture: 4198
 creating struct to hold images and inserting into map cache
 pushed images into the map
-
-loading from data ==========
-size: 172x150
-
-
-loading from data ==========
-size: 172x150
-
-
-loading from data ==========
-size: 172x150
-
+[bbmsputil - image_create] creating loaded image file with id of 5758
+[bbmsputil - image_create] creating loaded image file with id of 10113
+[bbmsputil - image_create] creating loaded image file with id of 17515
+Image was loaded from a file
 no errors creating temp file for avatar
 returning from call
+Image was loaded from a file
 no errors creating temp file for avatar
 returning from call
+Image was loaded from a file
 no errors creating temp file for avatar
 returning from call
