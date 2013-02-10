@@ -64,32 +64,77 @@ package ane.bbm {
       }
       
       //======================================= UPDATE FUNCTIONS =================================
+           
+      /**
+       * Set the display picture on the cached user profile object. Does not update the display picture
+       * for the BBM Profile; to update that use the setUserProfileDisplayPicture. 
+       * @param id The ID of the picture in the ANE image cache as returned by one of the load functions.
+       * @return none
+       * 
+       */
       public function setDisplayPicture(id:Number):void {
          this._context.call( "bbm_ane_bbmsp_profile_set_user_display_picture", id );
       }
       
+      /**
+       * Set the display picture on the actual user profile object. Prompts the user to accept the changes
+       * to the profile. 
+       * @param id The ID of the picture in the ANE image cache as returned by one of the load functions.
+       * @return none
+       * 
+       */
       public function setUserProfileDisplayPicture(id:Number):void {
          this._context.call( "bbm_ane_bbmsp_set_user_profile_display_picture", id );            
       }
       
-      public function setStatusMessage(status:int,msg:String):void {
+      /**
+       * Set the status and an optional status message on the cached user profile object. Does not update
+       * the actual BBM Profile; to update that use the setUserProfileStatusMessage. 
+       * @param id The user status (1 for Busy or 0 for Available)
+       * @param msg The custom status message to post on the profile
+       * @return none
+       * 
+       */
+      public function setStatusMessage(status:int,msg:String = ""):void {
          trace("Set profile status msg: "+msg);
          if( msg == null ) msg = " ";
          this._context.call( "bbm_ane_bbmsp_profile_set_status", status, msg, msg.length );
       }
       
+      /**
+       * Set the status and an optional status message on the actual user profile object. Displays a 
+       * prompt requesting the user accept the changes.
+       * @param id The user status (1 for Busy or 0 for Available)
+       * @param msg The custom status message to post on the profile
+       * @return none
+       * 
+       */
       public function setUserProfileStatus(status:int,msg:String):void {
          trace("Set user status msg: "+msg);
          if( msg == null ) msg = " ";
          this._context.call( "bbm_ane_bbmsp_set_user_profile_status", status, msg, msg.length );
       }
       
+      /**
+       * Set the personal message on the cached user profile object. Does not update
+       * the actual BBM Profile; to update that use the setUserPersonalMessage. 
+       * @param msg The personal message to post on the profile
+       * @return none
+       * 
+       */
       public function setPersonalMessage(msg:String):void {
          trace("Set profile personal msg: "+msg);
          if( msg == null ) msg = " ";
          this._context.call( "bbm_ane_bbmsp_profile_set_personal_message", msg, msg.length );
       }
       
+      /**
+       * Set the personal message on the actual user profile object. Displays a 
+       * prompt requesting the user accept the changes.
+       * @param msg The personal message to post on the profile
+       * @return none
+       * 
+       */
       public function setUserProfilePersonalMessage(msg:String):void {
          trace("Set user personal msg: "+msg);
          if( msg == null ) msg = " ";

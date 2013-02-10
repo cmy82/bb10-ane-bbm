@@ -23,7 +23,52 @@ package ane.bbm {
          _context.addEventListener( StatusEvent.STATUS, profileStatusUpdate );
       }
       
+      //======================================= INFO FUNCTIONS ==================================
+      //Position 0 in the itemlist is the oldest item in the Profile Box
       
+      /**
+       * Retrieves a string representing the text shown in the specified profile box item.
+       * @param item the position in the profile box itemlist to check
+       * @return The text string displayed in the profile box item.
+       * 
+       */      
+      public function getText(item:Number):String {
+         var result:Object = result = _context.call( "bbm_ane_bbmsp_user_profile_box_item_get_text", item );
+         return result.toString();
+      }
+      
+      /**
+       * Retrieves a string representing the cookie associated with the specified profile box item.
+       * @param item the position in the profile box itemlist to check
+       * @return The cookie text string associated with the profile box item.
+       * 
+       */      
+      public function getCookie(item:Number):String {
+         var result:Object = result = _context.call( "bbm_ane_bbmsp_user_profile_box_item_get_cookie", item );
+         return result.toString();
+      }
+      
+      /**
+       * Retrieves the icon id for the image associated with the specified profile box item.
+       * @param item the position in the profile box itemlist to check
+       * @return Icon ID of associated image or -1 if no image is associated.
+       * 
+       */      
+      public function getIconID(item:Number):Number {
+         var result:Object = result = _context.call( "bbm_ane_bbmsp_user_profile_box_item_get_icon_id", item );
+         return Number(result);
+      }
+      
+      /**
+       * Retrieves the number of items in the profile box
+       * @param none
+       * @return Number of items in profile box
+       * 
+       */      
+      public function getProfileBoxSize():Number {
+         var result:Object = _context.call( "bbm_ane_bbmsp_user_profile_box_items_size" );
+         return Number(result);
+      }           
       
       //======================================= UPDATE FUNCTIONS =================================
       public function addItem(text:String,cookie:String,icnID:Number = -1):void {
@@ -35,6 +80,14 @@ package ane.bbm {
          trace("result: "+result.toString());
       }
       
+      public function removeItem(item:Number):void {
+         _context.call( "bbm_ane_bbmsp_user_profile_box_itemlist_remove_at", item );
+      }
+      
+      public function removeAllItems():void {
+         _context.call( "bbm_ane_bbmsp_user_profile_box_remove_all_items" );
+      }
+           
       public function registerIcon(imageID:Number,iconID:Number):void {
          trace("registering icon "+imageID+" with id "+iconID);
          var result:Object = _context.call( "bbm_ane_bbmsp_user_profile_box_register_icon", iconID, imageID );

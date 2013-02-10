@@ -53,25 +53,6 @@ static void notifyProfileBoxChanged(char *event, int data);
 //======================================================================================//
 
 /**
- * @brief Retrieve the ID associated with a profile box item.
- * @details Each profile box item is identified by a unique,
- * non-negative numeric ID. If @c bbmsp_can_show_profile_box() returns false,
- * this method will return @c BBMSP_FAILURE.
- *
- * @param item A pointer to the profile box item.
- * @param item_id_buffer A pointer to the buffer where the ID will be
- * stored.
- * @param buffer_size The size of the @c itemid buffer.
- *
- * @return @c BBMSP_SUCCESS if successful, @c BBMSP_FAILURE otherwise.
- * @see BBMSP_SUCCESS, BBMSP_FAILURE, BBMSP_PROFILE_BOX_ITEM_ID_MAX
- */
-//BBMSP_API bbmsp_result_t bbmsp_user_profile_box_item_get_item_id(const bbmsp_user_profile_box_item_t* item,
-//                                                                 char* item_id_buffer, size_t buffer_size);
-FREObject bbm_ane_bbmsp_user_profile_box_item_get_item_id(FREContext ctx, void* functionData,
-                                                          uint32_t argc, FREObject argv[]);
-
-/**
  * @brief Retrieve the cookie associated with a profile box item.
  * @details A cookie is a string that you can customize for your app. If @c
  * bbmsp_can_show_profile_box() returns false, this method will return @c

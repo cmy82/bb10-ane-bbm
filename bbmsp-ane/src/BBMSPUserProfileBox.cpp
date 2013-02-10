@@ -221,7 +221,7 @@ FREObject bbm_ane_bbmsp_user_profile_box_item_get_text(FREContext ctx, void* fun
    FREGetObjectAsUint32(argv[0],&itemNum);
 
    const bbmsp_user_profile_box_item_t *item = bbmsp_user_profile_box_itemlist_get_at(profileBoxList,itemNum);
-   bbmsp_result_t code = bbmsp_user_profile_box_item_get_cookie(item,txt,BBMSP_PROFILE_BOX_ITEM_TEXT_MAX);
+   bbmsp_result_t code = bbmsp_user_profile_box_item_get_text(item,txt,BBMSP_PROFILE_BOX_ITEM_TEXT_MAX);
 
    FREObject result;
    FRENewObjectFromUTF8((uint32_t)(strlen(txt)+1), (uint8_t*)txt, &result);

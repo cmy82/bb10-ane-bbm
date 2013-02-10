@@ -9,10 +9,13 @@ package ane.bbm {
          _context = context;
       }
       
+      /**
+       * Send a download invitation for a BBM contact to download your app.
+       * @param none
+       * @return none
+       */
       public function sendDownloadInvite( ):void {
-         trace("Calling send download invitation");
-         var result:Object = this._context.call( "bbm_ane_bbmsp_send_download_invitation", null );
-         trace("result was "+result.toString());
+         var result:Object = this._context.call( "bbm_ane_bbmsp_send_download_invitation", null );         
       }
    }
 }

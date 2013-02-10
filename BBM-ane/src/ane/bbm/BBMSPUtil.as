@@ -30,7 +30,15 @@ package ane.bbm {
       }
 
 	   //================================== DATA FUNCTIONS ====================================
-	   public function getImageType(id:Number):String {
+         
+      /**
+       * Gets the image type from an image loaded to the ANE by the ID. 
+       * @param id Image ID of the image to check. ID is returned after image has been uploaded by a call to one of the
+       *           loadImage functions.
+       * @return  The image type/extension as a string.
+       * 
+       */
+      public function getImageType(id:Number):String {
          for( var i:int = 0; i<_imageList.length; i++ ){
             if( _imageList[i].id == id ){
                _imageList[i] = null;
@@ -47,7 +55,14 @@ package ane.bbm {
          return "Unknown";
 	   }
 	  
-	   public function getImageSize(id:Number):Number {
+      /**
+       * Get the size of an image loaded to the ANE in bytes by the ID.
+       * @param id Image ID of the image to check. ID is returned after image has been uploaded by a call to one of the
+       *           loadImage functions.
+       * @return The size of the image data in bytes.
+       * 
+       */
+	   public function getImageDataSize(id:Number):Number {
          for( var i:int = 0; i<_imageList.length; i++ ){
             if( _imageList[i].id == id ){
 	 			  _imageList[i] = null;
@@ -58,18 +73,31 @@ package ane.bbm {
 		   return -1;  
 	   }
 	   
+      /**
+       * Deletes an image file from the ANE by the ID.
+       * @param id Image ID of the image to check. ID is returned after image has been uploaded by a call to one of the
+       *           loadImage functions.
+       * @return Returns -1 if the delete operation failed.
+       * 
+       */
 	   public function deleteImage(id:Number):Number {
 	 	   for( var i:int = 0; i<_imageList.length; i++ ){
  			   if( _imageList[i].id == id ){ 
-				   _imageList[i] = null;
-				   var result:Object = this._context.call( "bbm_ane_bbmsp_image_destroy", id );
+               var result:Object = this._context.call( "bbm_ane_bbmsp_image_destroy", id );
+               if( Number(result) != -1 )  _imageList[i] = null;
 				   return Number(result );
 			   }
 		   }
 		   return -1;
 	   }
-	  
       
+      /**
+       * Check to see whether an image has been loaded to the ANE by ID.
+       * @param id Image ID of the image to check. ID is returned after image has been uploaded by a call to one of the
+       *           loadImage functions.
+       * @return True or false whether or no the image is located in the ANE.
+       * 
+       */        
       public function imageExists(id:Number):Boolean {
          var result:Object = this._context.call( "bbm_ane_image_exists", id );
          if( Number(result) == 0 ) return false;
@@ -77,6 +105,14 @@ package ane.bbm {
       }
       
       //================================== LOADING FUNCTIONS ====================================
+      
+      
+      /**
+       * Loads an image from the device using FilePicker.
+       * @param none
+       * @return none 
+       * 
+       */
       public function loadImage():void {
          var dir:File = File.userDirectory.resolvePath( 'shared/photos' );
          var imgFilter:FileFilter = new FileFilter("Images", "*.png;*.bmp;*.jpg;*.jpeg");
@@ -86,6 +122,13 @@ package ane.bbm {
       }
       
       
+      /**
+       * Loads an image from file data to the ANE.
+       * @param name Name to give to the loaded image file
+       * @param img The bitmap image to load
+       * @return none
+       * 
+       */
       public function loadImageFromBitmap(name:String,img:Bitmap):void {
          var rect:Rectangle = new Rectangle(0,0,img.width,img.height);
          var data:ByteArray = img.bitmapData.getPixels(rect);
@@ -102,6 +145,12 @@ package ane.bbm {
          }
       }
       
+      /**
+       * Loads an image file that was packaged with the application
+       * @param loc The relative file location in respect to the File.applicationDirectory location.
+       * @return none
+       * 
+       */
       public function loadImageFromResource(loc:String):void {
         var rsrcFile:File = File.applicationDirectory.resolvePath(loc);
         trace(rsrcFile.nativePath);
@@ -124,6 +173,7 @@ package ane.bbm {
       
       private function loadCanceled(e:Event):void { }
       
+      //Performs actual loading of the image after selected from FilePicker
       private function imageSelected(e:Event):void {
          var imageFile:File = e.target as File;
          var imageStream:FileStream = new FileStream();                  
@@ -144,6 +194,13 @@ package ane.bbm {
       }
                 
       //=============================== RETRIEVING FUNCTIONS ====================================
+      
+      /**
+       * Calls for the full/original image with the specified ID to be loaded by the ANE.
+       * @param id ID number of the image to load.
+       * @return none
+       * 
+       */
       public function retrieveImage(id:Number):void {
          var size:Object = this._context.call( "bbm_ane_bbmsp_image_get_data_size", id );
          var imgData:ByteArray = new ByteArray();
@@ -153,7 +210,14 @@ package ane.bbm {
          loader.contentLoaderInfo.addEventListener(Event.COMPLETE,imageRetrieved)
          loader.loadBytes(imgData);         
       }
-      
+                
+      /**
+       * Calls for the reduced/profile image with the specified ID to be loaded by the ANE. Returned image is suitable for use
+       * as a profile picture or as a profile box item icon.
+       * @param id ID number of the image to load.
+       * @return none
+       * 
+       */
       public function retrieveProfileImage(id:Number):void {
          var size:Object = this._context.call( "bbm_ane_bbmsp_image_get_profile_data_size", id );
          var imgData:ByteArray = new ByteArray();
@@ -163,7 +227,8 @@ package ane.bbm {
          loader.contentLoaderInfo.addEventListener(Event.COMPLETE,profileImageRetrieved)
          loader.loadBytes(imgData);         
       }
-                               
+         
+      //Performs actual loading of retrieved data into a bitmap from retrieveProfile
       private function imageRetrieved(e:Event):void {
          var loaderInfo:LoaderInfo = e.target as LoaderInfo;
          var loader:Loader = loaderInfo.loader;     
@@ -175,6 +240,7 @@ package ane.bbm {
 		   dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_RETRIEVED,0,"",bmp) );
       }
       
+      //Performs actual loading of retrieved data into a bitmap from retrieveProfileImage
       private function profileImageRetrieved(e:Event):void {
          var loaderInfo:LoaderInfo = e.target as LoaderInfo;
          var loader:Loader = loaderInfo.loader;     
@@ -187,6 +253,8 @@ package ane.bbm {
       }
       
       //======================================= MISCELLANEOUS FUNCTIONS =================================
+      
+      //Dispatches the status events 
       private function imageStatusUpdate(e:StatusEvent):void {
          if(e.code == ANEImageEvent.IMAGE_LOADED ){
             var id:Number = Number(e.level);
@@ -200,6 +268,7 @@ package ane.bbm {
          }
       }
       
+      //Searches for filename and returns true if already stored
       private function search(img:String):Boolean {
          if( _imageList.length == 0 ) return false;
          var found:Boolean = false;
@@ -212,6 +281,7 @@ package ane.bbm {
          return found;
       }
       
+      //Searches if filename is already stored and returns ImageTracker object
       private function findByName(img:String):ImageTracker {
          var found:ImageTracker;
          for( var i:int = 0; i<_imageList.length; i++ ){
@@ -223,6 +293,7 @@ package ane.bbm {
          return found;
       }
       
+      //Searches to see if ID is already stored and returns ImageTracker object
       private function findByID(id:Number):ImageTracker {
          var found:ImageTracker = null;
          for( var i:int = 0; i<_imageList.length; i++ ){
@@ -238,7 +309,7 @@ package ane.bbm {
 
 
 
-
+//Class used to internally track whether an image has been loaded
 class ImageTracker {
    private var _name:String;
    private var _id:Number;

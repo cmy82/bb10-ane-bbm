@@ -126,14 +126,14 @@ void* initImageThread(void *data){
 
             image = image.convertToFormat(QImage::Format_ARGB4444_Premultiplied);
             scaled = image.scaled(maxWidth,maxHeight,Qt::KeepAspectRatio);
-            while( scaled.byteCount() > 32768 ){
+            while( scaled.byteCount() > 98304 /*32768*/ ){
                //To save image must be smaller than 32k
                maxWidth-=10;
                maxHeight-=10;
                scaled = image.scaled(maxWidth,maxHeight,Qt::KeepAspectRatio);
                //cout << "image was too large and had to be scaled: " << maxWidth << "x" << maxHeight << endl;
             }
-            scaled.save(tempAvatar);
+            scaled.save(tempAvatar,"JPG",70);
 
             bool errored = false;
             QFile tempFile(tempAvatar);
@@ -368,6 +368,8 @@ FREObject bbm_ane_bbmsp_image_get_data(FREContext ctx, void* functionData,
    char *data = bbmsp_image_get_data(images->original);
    uint32_t size = bbmsp_image_get_data_size(images->original);
 
+   cout << "Original image size: " << size << endl;
+
    FREByteArray imageData;
    FREAcquireByteArray(argv[1],&imageData);
    for(uint32_t i=0; i<size; ++i){
@@ -386,6 +388,8 @@ FREObject bbm_ane_bbmsp_image_get_profile_data(FREContext ctx, void* functionDat
 
    char *data = bbmsp_image_get_data(images->profile);
    uint32_t size = bbmsp_image_get_data_size(images->profile);
+
+   cout << "Profile image size: " << size << endl;
 
    FREByteArray imageData;
    FREAcquireByteArray(argv[1],&imageData);

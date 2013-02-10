@@ -1,8 +1,7 @@
 package ane.bbm {   
    import flash.external.ExtensionContext;
 
-   public class BBMAne {
-      
+   public class BBMAne {      
       private var context:ExtensionContext;
       public var bbmspRegistration:BBMSP;
       public var bbmspContext:BBMSPContext;
@@ -13,11 +12,11 @@ package ane.bbm {
       
       public function BBMAne() {
          context = ExtensionContext.createExtensionContext( "BSLLC.library.ane.BBM", null );
-         bbmspRegistration = new BBMSP(context);
-         bbmspContext = new BBMSPContext(context);
-         bbmspInvite = new BBMMessaging(context);
-         bbmspImages = new BBMSPUtil(context);
-         bbmspUserProfile = new BBMSPUserProfile(context);
+         bbmspRegistration   = new BBMSP(context);
+         bbmspContext        = new BBMSPContext(context);
+         bbmspInvite         = new BBMMessaging(context);
+         bbmspImages         = new BBMSPUtil(context);
+         bbmspUserProfile    = new BBMSPUserProfile(context);
          bbmspUserProfileBox = new BBMSPUserProfileBox(context);
       }      
       

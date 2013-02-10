@@ -165,10 +165,9 @@
          this.stage.addChild(profileBox);
       }
                 
-      private function retrieveImage(e:ANEImageEvent):void {
-         trace("calling retrieve image for loaded profile image "+e.id);
-         if( profLoading ){            
-            //need to call function to get the profile image back and not the fullimage
+      private function retrieveImage(e:ANEImageEvent):void {         
+         if( profLoading ){
+            trace("[ANE Test] Calling retrieve image for loaded profile image "+e.id);
             var id:Number = e.id;
             imgId = id;
             bbmExtension.bbmspImages.retrieveImage(id);
@@ -207,6 +206,7 @@ import qnx.fuse.ui.buttons.LabelButton;
 import qnx.fuse.ui.buttons.SegmentedControl;
 import qnx.fuse.ui.buttons.ToggleSwitch;
 import qnx.fuse.ui.core.Container;
+import qnx.fuse.ui.listClasses.ScrollDirection;
 import qnx.fuse.ui.skins.SkinAssets;
 import qnx.fuse.ui.text.Label;
 import qnx.fuse.ui.text.TextArea;
@@ -223,6 +223,7 @@ class ProfileCard extends Sprite {
    private var persMsg:TextArea;
    private var status:ToggleSwitch;
    private var imgID:Number;
+   private var pb1:Container, pb2:Container, pb3:Container;
    
    public function ProfileCard(bbm:BBMAne,pic:Bitmap) {
       _bbm = bbm;
@@ -257,6 +258,10 @@ class ProfileCard extends Sprite {
       profile.width = this.width-30;      
       profile.y = 15;
       profile.x = 15;
+      profile.setActualSize(this.width-30,this.height-115);
+      
+      profile.scrollDirection = ScrollDirection.VERTICAL;
+      profile.vScrollVisible = true;
       addChild(profile);
       
       img = new Sprite();
@@ -323,6 +328,47 @@ class ProfileCard extends Sprite {
       persMsg.prompt = "Personal Message";
       profile.addChild(persMsg);
       
+      pb1 = new Container();
+      pb1.height = 160;
+      pb1.width = this.width-40;      
+      pb1.y = 520;
+      pb1.x = 5;
+      
+      pb2 = new Container();
+      pb2.height = 160;
+      pb2.width = this.width-40;      
+      pb2.y = 680;
+      pb2.x = 5;
+      
+      pb3 = new Container();
+      pb3.height = 160;
+      pb3.width = this.width-40;      
+      pb3.y = 840;
+      pb3.x = 5;
+      
+      for( var i:int = 0; i< _bbm.bbmspUserProfileBox.getProfileBoxSize(); ++i ){
+         var pb:Container = null;
+         if( i==0 ){ profile.addChild(pb1); pb = pb1; }
+         if( i==1 ){ profile.addChild(pb2); pb = pb2; }
+         if( i==2 ){ profile.addChild(pb3); pb = pb3; }
+         
+         var txt:Label = new Label();
+         txt.width = pb.width - 160;
+         txt.height = 80;
+         txt.x = 160;
+         txt.y = 0;
+         txt.text = _bbm.bbmspUserProfileBox.getText(i);
+         pb.addChild(txt);
+         
+         var cke:Label = new Label();
+         cke.width = pb.width-160;
+         cke.height = 80;
+         cke.x = 160;
+         cke.y = 80;
+         cke.text = _bbm.bbmspUserProfileBox.getCookie(i);
+         pb.addChild(cke);
+         
+      }
       
       
       this.y = stage.stageHeight/4;      
@@ -366,6 +412,7 @@ class ProfileCard extends Sprite {
    }
    
    private function retrieveProfileImage(e:ANEImageEvent):void {
+      trace("[ProfileCard] Retrieve profile image called for id "+e.id);
       var id:Number = e.id;
       imgID = id;
       _bbm.bbmspImages.retrieveProfileImage(id);      

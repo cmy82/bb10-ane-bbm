@@ -86,7 +86,7 @@ FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc,
 	char temp10[13];
 
 
-	itoa(runCount,temp3,10);
+	//itoa(runCount,temp3,10);
 	itoa(ane_master_domain,temp4,10);
 	itoa(ane_master_channel_id,temp5,10);
 	itoa(ane_image_map->size(),temp7,10);
@@ -153,11 +153,13 @@ FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc,
    strcat(temp,out10);
 
 	FREObject result;
-	FRENewObjectFromUTF8((uint32_t)(strlen(temp) + 1), (uint8_t*)temp, &result);
+	FRENewObjectFromUTF8((uint32_t)(strlen(temp)+1), (uint8_t*)temp, &result);
 	return result;
 }
 
 static void* initAneThread(void *data){
+   srand ( time(NULL) );
+
    //Init bps services
    bps_initialize();
    //Get an event domain from the BPS library to use when pushing events to child threads
@@ -504,7 +506,6 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                    "bbm_ane_bbmsp_set_user_profile_personal_message",
                                    "bbm_ane_bbmsp_set_user_profile_status",
                                    //PROFILE BOX
-                                   "bbm_ane_bbmsp_user_profile_box_item_get_item_id",
                                    "bbm_ane_bbmsp_user_profile_box_item_get_cookie",
                                    "bbm_ane_bbmsp_user_profile_box_item_get_text",
                                    "bbm_ane_bbmsp_user_profile_box_item_get_icon_id",
@@ -546,7 +547,6 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                   bbm_ane_bbmsp_profile_set_personal_message,
                                   bbm_ane_bbmsp_set_user_profile_personal_message,
                                   bbm_ane_bbmsp_set_user_profile_status,
-                                  bbm_ane_bbmsp_user_profile_box_item_get_item_id,
                                   bbm_ane_bbmsp_user_profile_box_item_get_cookie,
                                   bbm_ane_bbmsp_user_profile_box_item_get_text,
                                   bbm_ane_bbmsp_user_profile_box_item_get_icon_id,
