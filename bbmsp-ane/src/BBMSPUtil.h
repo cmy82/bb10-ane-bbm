@@ -46,6 +46,10 @@ void* initImageThread(void *data);
 static void notifyImageComplete(int id);
 FREObject bbm_ane_image_exists(FREContext ctx, void* functionData,  uint32_t argc, FREObject argv[]);
 FREObject bbm_ane_create_image_from_data(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]);
+FREObject bbm_ane_find_image_by_icon_id(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]);
+FREObject bbm_ane_image_get_profile_data(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]);
+FREObject bbm_ane_image_get_profile_data_size(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]);
+
 
 //======================================================================================//
 //                   STANDARD FUNCTIONS FROM bbmsp_util.h QNX FILE
@@ -112,8 +116,6 @@ FREObject bbm_ane_bbmsp_image_get_type(FREContext ctx, void* functionData,
 //BBMSP_API char* bbmsp_image_get_data(bbmsp_image_t* image);
 FREObject bbm_ane_bbmsp_image_get_data(FREContext ctx, void* functionData,
                                        uint32_t argc, FREObject argv[]);
-FREObject bbm_ane_bbmsp_image_get_profile_data(FREContext ctx, void* functionData,
-                                               uint32_t argc, FREObject argv[]);
 
 /**
  * @brief Returns the size of image object.
@@ -125,8 +127,6 @@ FREObject bbm_ane_bbmsp_image_get_profile_data(FREContext ctx, void* functionDat
 //BBMSP_API unsigned int bbmsp_image_get_data_size(bbmsp_image_t* image);
 FREObject bbm_ane_bbmsp_image_get_data_size(FREContext ctx, void* functionData,
                                             uint32_t argc, FREObject argv[]);
-FREObject bbm_ane_bbmsp_image_get_profile_data_size(FREContext ctx, void* functionData,
-                                                    uint32_t argc, FREObject argv[]);
 
 
 

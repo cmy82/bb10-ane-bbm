@@ -9,7 +9,7 @@ package ane.bbm.events {
       public static const PROFILE_BOX_ICN_REG:String = "ANEProfileBoxIconRegistered";
       public static const PROFILE_BOX_ICN_RET:String = "ANEProfileBoxIconRetrieved";
       
-      public function ANEUserProfileBoxEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false) {
+      public function ANEUserProfileBoxEvent(type:String, id:Number=-1, bubbles:Boolean=false, cancelable:Boolean=false) {
          super(type, bubbles, cancelable);
       }
    }

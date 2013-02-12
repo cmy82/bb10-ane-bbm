@@ -285,6 +285,57 @@ FREObject bbm_ane_create_image_from_data(FREContext ctx, void* functionData, uin
    return result;
 }
 
+FREObject bbm_ane_find_image_by_icon_id(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]){
+   int32_t iconID;
+   int32_t imageID = -1;
+   FREGetObjectAsInt32(argv[0],&iconID);
+
+   bool found = false;
+   for (map<int,ane_image_s*>::iterator it=ane_image_map->begin(); it!=ane_image_map->end(); ++it){
+      ane_image_s *images = it->second;
+      if( images->iconID == iconID ){
+         found = true;
+         imageID = it->first;
+         break;
+      }
+   }
+
+   FREObject result;
+   FRENewObjectFromInt32(imageID, &result);
+   return result;
+}
+
+FREObject bbm_ane_image_get_profile_data(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]){
+   int imageID;
+   FREGetObjectAsInt32(argv[0],&imageID);
+   ane_image_s *images = (*ane_image_map)[imageID];
+
+   char *data = bbmsp_image_get_data(images->profile);
+   uint32_t size = bbmsp_image_get_data_size(images->profile);
+
+   cout << "Profile image size: " << size << endl;
+
+   FREByteArray imageData;
+   FREAcquireByteArray(argv[1],&imageData);
+   for(uint32_t i=0; i<size; ++i){
+      imageData.bytes[i] = data[i];
+   }
+   FREReleaseByteArray(argv[1]);
+
+   return NULL;
+}
+
+FREObject bbm_ane_image_get_profile_data_size(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]){
+   int imageID;
+   FREGetObjectAsInt32(argv[0],&imageID);
+   ane_image_s *images = (*ane_image_map)[imageID];
+
+   unsigned int code = bbmsp_image_get_data_size(images->profile);
+   FREObject result;
+   FRENewObjectFromUint32(code, &result);
+   return result;
+}
+
 //======================================================================================//
 //                   STANDARD FUNCTIONS FROM bbmsp_util.h QNX FILE
 //======================================================================================//
@@ -380,27 +431,6 @@ FREObject bbm_ane_bbmsp_image_get_data(FREContext ctx, void* functionData,
    return NULL;
 }
 
-FREObject bbm_ane_bbmsp_image_get_profile_data(FREContext ctx, void* functionData,
-                                               uint32_t argc, FREObject argv[]){
-   int imageID;
-   FREGetObjectAsInt32(argv[0],&imageID);
-   ane_image_s *images = (*ane_image_map)[imageID];
-
-   char *data = bbmsp_image_get_data(images->profile);
-   uint32_t size = bbmsp_image_get_data_size(images->profile);
-
-   cout << "Profile image size: " << size << endl;
-
-   FREByteArray imageData;
-   FREAcquireByteArray(argv[1],&imageData);
-   for(uint32_t i=0; i<size; ++i){
-      imageData.bytes[i] = data[i];
-   }
-   FREReleaseByteArray(argv[1]);
-
-   return NULL;
-}
-
 //BBMSP_API unsigned int bbmsp_image_get_data_size(bbmsp_image_t* image);
 FREObject bbm_ane_bbmsp_image_get_data_size(FREContext ctx, void* functionData,
                                             uint32_t argc, FREObject argv[]){
@@ -414,17 +444,6 @@ FREObject bbm_ane_bbmsp_image_get_data_size(FREContext ctx, void* functionData,
    return result;
 }
 
-FREObject bbm_ane_bbmsp_image_get_profile_data_size(FREContext ctx, void* functionData,
-                                                    uint32_t argc, FREObject argv[]){
-   int imageID;
-   FREGetObjectAsInt32(argv[0],&imageID);
-   ane_image_s *images = (*ane_image_map)[imageID];
-
-   unsigned int code = bbmsp_image_get_data_size(images->profile);
-   FREObject result;
-   FRENewObjectFromUint32(code, &result);
-   return result;
-}
 
 
 

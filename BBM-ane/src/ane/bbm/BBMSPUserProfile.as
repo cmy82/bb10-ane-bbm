@@ -23,41 +23,90 @@ package ane.bbm {
          _context.addEventListener( StatusEvent.STATUS, profileStatusUpdate );
       }
       
+      /**
+       * Retrieve users personal message.
+       * @param none 
+       * @return Current personal message on users BBM profile.
+       * 
+       */
       public function getUserPersonalMessage():String {
          var result:Object = this._context.call( "bbm_ane_bbmsp_profile_get_personal_message" );
          return result.toString();
       }
       
+      /**
+       * Retrieve users current BBM status (Busy or Available).
+       * @param none 
+       * @return Users current status.
+       * 
+       */
       public function getUserStatus():String {
          var result:Object = this._context.call( "bbm_ane_bbmsp_profile_get_status" );
          return result.toString();
       }
       
+      /**
+       * Retrieve users current BBM custom status message.
+       * @param none 
+       * @return Users current custom status message.
+       * 
+       */
       public function getUserStatusMessage():String {
          var result:Object = this._context.call( "bbm_ane_bbmsp_profile_get_status_message" );
          return result.toString();
       }
       
+      /**
+       * Retrieve users BBM display name.
+       * @param none 
+       * @return Users display name.
+       * 
+       */
       public function getUserDisplayName():String {
          var result:Object = this._context.call( "bbm_ane_bbmsp_profile_get_display_name" );
          return result.toString();
       }
       
+      /**
+       * Retrieve users PPID. The PPID is a device independent string attached to a users BBID.
+       * @param none 
+       * @return Users PPID.
+       * 
+       */
       public function getUserPPID():String {
          var result:Object = this._context.call( "bbm_ane_bbmsp_profile_get_ppid" );
          return result.toString();
       }
       
+      /**
+       * Retrieve users handle. The handle is a device dependent string used for backwards compatibility with BlackBerry 
+       * 7 and earlier.
+       * @param none 
+       * @return Users PPID.
+       * 
+       */
       public function getUserHandle():String {
          var result:Object = this._context.call( "bbm_ane_bbmsp_profile_get_handle" );
          return result.toString();
       }
       
+      /**
+       * Retrieve current installed version of app.
+       * @param none 
+       * @return Users current app version.
+       * 
+       */
       public function getUserAppVersion():String {
          var result:Object = this._context.call( "bbm_ane_bbmsp_profile_get_app_version" );
          return result.toString();
       }
       
+      /**
+       * Retrieve users current BBM profile pic ID (ID number as returned by one of the image load functions).
+       * @param none 
+       * @return ID number of current profile pic.
+       * 
+       */
       public function getUserProfilePicture():Number {
          var result:Object = this._context.call( "bbm_ane_bbmsp_profile_get_display_picture" );
          return Number(result);

@@ -9,23 +9,7 @@ did user change picture: 0
 was profile pictured changed: 1
 getting profile picture and a copy since the picture is not yet cached
 was able to get and create images
-size of profile picture: 6392
+size of profile picture: 8342
 creating struct to hold images and inserting into map cache
 pushed images into the map
-Original image size: 6392
-[bbmsputil - image_create] creating loaded image file with id of 5758
-Image was loaded from a file
-no errors creating temp file for avatar
-returning from call
-Original image size: 1032650
-Profile image size: 8342
-trying to retrieve images for id 5758
-about to call set user profile display picture: 5758
-Result of call to change profile picture: 1
-profile picture was set by user - not needed to be retrieved
-============BBMSP Profile Changed Event Received===========
-getting user profile picture 
-did user change picture: 1
-was profile pictured changed: 1
-user changed profile pic - returning stored profile picture id: 5758
-Original image size: 1032650
+Original image size: 8342

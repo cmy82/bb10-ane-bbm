@@ -290,6 +290,7 @@ static void* initAneThread(void *data){
               }
 
               if( eventCategory == BBMSP_USER_PROFILE_BOX ){
+                 cout << "===================BBMSP PROFILE BOX EVENT RECIEVED==============" << endl;
                  if( eventType == BBMSP_SP_EVENT_USER_PROFILE_BOX_ITEM_ADDED ){
                     cout << "============BBMSP Profile Box Item Added Event Received===========" << endl;
                     bps_event_t         *aneProfileBoxEvent;
@@ -483,9 +484,10 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                    "bbm_ane_bbmsp_image_get_type",
                                    "bbm_ane_bbmsp_image_get_data",
                                    "bbm_ane_bbmsp_image_get_data_size",
-                                   "bbm_ane_bbmsp_image_get_profile_data",
-                                   "bbm_ane_bbmsp_image_get_profile_data_size",
+                                   "bbm_ane_image_get_profile_data",
+                                   "bbm_ane_image_get_profile_data_size",
                                    "bbm_ane_image_exists",
+                                   "bbm_ane_find_image_by_icon_id",
                                    //ACCESS
                                    "bbm_ane_bbmsp_is_access_allowed",
                                    "bbm_ane_bbmsp_can_show_profile_box",
@@ -527,9 +529,10 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                   bbm_ane_bbmsp_image_get_type,
                                   bbm_ane_bbmsp_image_get_data,
                                   bbm_ane_bbmsp_image_get_data_size,
-                                  bbm_ane_bbmsp_image_get_profile_data,
-                                  bbm_ane_bbmsp_image_get_profile_data_size,
+                                  bbm_ane_image_get_profile_data,
+                                  bbm_ane_image_get_profile_data_size,
                                   bbm_ane_image_exists,
+                                  bbm_ane_find_image_by_icon_id,
                                   bbm_ane_bbmsp_is_access_allowed,
                                   bbm_ane_bbmsp_can_show_profile_box,
                                   bbm_ane_bbmsp_can_send_bbm_invite,

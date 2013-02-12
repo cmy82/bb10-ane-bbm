@@ -124,7 +124,7 @@ void* initProfileBoxThread(void *data){
                }
 
                if( eventCode == PROFILE_BOX_CHANGED_ICN_RET ){
-                  //Each icon that is retrieved store in the image map if not already present
+                  //Each icon that is retrieved, store in the image map if not already present
                   bps_event_payload_t *payload = bps_event_get_payload(bps_event);
                   int32_t iconID = (int32_t)payload->data1;
                   bool found = false;
@@ -144,7 +144,7 @@ void* initProfileBoxThread(void *data){
                      images->original = (bbmsp_image_t*)payload->data2;
                      images->profile  = (bbmsp_image_t*)payload->data2;
                      ane_image_map->insert( std::pair<int,ane_image_s*>(id,images) );
-                     notifyProfileBoxChanged("ANEProfileBoxIconRetrieved",id);
+                     notifyProfileBoxChanged("ANEProfileBoxIconRetrieved",iconID);
                   }
                }
             }
@@ -336,7 +336,7 @@ FREObject bbm_ane_bbmsp_user_profile_box_retrieve_icon(FREContext ctx, void* fun
                                                        uint32_t argc, FREObject argv[]){
    int iconID;
    FREGetObjectAsInt32(argv[0],&iconID);
-
+   cout << "Attempting to retrieve icon " << iconID << endl;
    bbmsp_result_t code = bbmsp_user_profile_box_retrieve_icon(iconID);
    FREObject result;
    FRENewObjectFromInt32(code, &result);

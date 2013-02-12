@@ -1,6 +1,5 @@
 package ane.bbm {
    import ane.bbm.events.ANEImageEvent;
-   import ane.utils.images.JPGEncoder;
    
    import flash.display.Bitmap;
    import flash.display.BitmapData;
@@ -105,8 +104,7 @@ package ane.bbm {
       }
       
       //================================== LOADING FUNCTIONS ====================================
-      
-      
+           
       /**
        * Loads an image from the device using FilePicker.
        * @param none
@@ -120,8 +118,7 @@ package ane.bbm {
          dir.addEventListener(Event.CANCEL,loadCanceled);
          dir.browseForOpen("Choose Image",[imgFilter]);
       }
-      
-      
+           
       /**
        * Loads an image from file data to the ANE.
        * @param name Name to give to the loaded image file
@@ -208,6 +205,7 @@ package ane.bbm {
          this._context.call( "bbm_ane_bbmsp_image_get_data", id, imgData );
          var loader:Loader = new Loader();
          loader.contentLoaderInfo.addEventListener(Event.COMPLETE,imageRetrieved)
+            loader.name = ""+id;
          loader.loadBytes(imgData);         
       }
                 
@@ -219,13 +217,14 @@ package ane.bbm {
        * 
        */
       public function retrieveProfileImage(id:Number):void {
-         var size:Object = this._context.call( "bbm_ane_bbmsp_image_get_profile_data_size", id );
+         var size:Object = this._context.call( "bbm_ane_image_get_profile_data_size", id );
          var imgData:ByteArray = new ByteArray();
          imgData.length = Number(size);
-         this._context.call( "bbm_ane_bbmsp_image_get_profile_data", id, imgData );
+         this._context.call( "bbm_ane_image_get_profile_data", id, imgData );
          var loader:Loader = new Loader();
          loader.contentLoaderInfo.addEventListener(Event.COMPLETE,profileImageRetrieved)
-         loader.loadBytes(imgData);         
+         loader.name = ""+id;
+         loader.loadBytes(imgData);                        
       }
          
       //Performs actual loading of retrieved data into a bitmap from retrieveProfile
@@ -237,7 +236,7 @@ package ane.bbm {
 		   bitmapData.draw(loaderInfo.loader);
 		 
 		   var bmp:Bitmap = new Bitmap(bitmapData);
-		   dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_RETRIEVED,0,"",bmp) );
+		   dispatchEvent( new ANEImageEvent(ANEImageEvent.IMAGE_RETRIEVED,Number(loader.name),"",bmp) );
       }
       
       //Performs actual loading of retrieved data into a bitmap from retrieveProfileImage
@@ -249,7 +248,7 @@ package ane.bbm {
          bitmapData.draw(loaderInfo.loader);
          
          var bmp:Bitmap = new Bitmap(bitmapData);
-         dispatchEvent( new ANEImageEvent(ANEImageEvent.PROF_IMAGE_RETRIEVED,0,"",bmp) );
+         dispatchEvent( new ANEImageEvent(ANEImageEvent.PROF_IMAGE_RETRIEVED,Number(loader.name),"",bmp) );
       }
       
       //======================================= MISCELLANEOUS FUNCTIONS =================================

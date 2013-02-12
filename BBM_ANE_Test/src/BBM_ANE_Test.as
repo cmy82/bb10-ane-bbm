@@ -192,6 +192,7 @@
 
 import ane.bbm.BBMAne;
 import ane.bbm.events.ANEImageEvent;
+import ane.bbm.events.ANEUserProfileBoxEvent;
 
 import flash.display.Bitmap;
 import flash.display.Sprite;
@@ -206,6 +207,11 @@ import qnx.fuse.ui.buttons.LabelButton;
 import qnx.fuse.ui.buttons.SegmentedControl;
 import qnx.fuse.ui.buttons.ToggleSwitch;
 import qnx.fuse.ui.core.Container;
+import qnx.fuse.ui.core.SizeOptions;
+import qnx.fuse.ui.display.Image;
+import qnx.fuse.ui.layouts.Align;
+import qnx.fuse.ui.layouts.gridLayout.GridData;
+import qnx.fuse.ui.layouts.gridLayout.GridLayout;
 import qnx.fuse.ui.listClasses.ScrollDirection;
 import qnx.fuse.ui.skins.SkinAssets;
 import qnx.fuse.ui.text.Label;
@@ -224,14 +230,17 @@ class ProfileCard extends Sprite {
    private var status:ToggleSwitch;
    private var imgID:Number;
    private var pb1:Container, pb2:Container, pb3:Container;
+   private var iconQueue:Vector.<int>;
    
    public function ProfileCard(bbm:BBMAne,pic:Bitmap) {
       _bbm = bbm;
       _pic = pic;
+      iconQueue = new Vector.<int>();
       this.addEventListener(Event.ADDED_TO_STAGE,init);  
       this.addEventListener(Event.REMOVED_FROM_STAGE,cleanup);      
       _bbm.bbmspImages.addEventListener(ANEImageEvent.PROF_IMAGE_RETRIEVED,displayImage);   
       _bbm.bbmspImages.addEventListener(ANEImageEvent.IMAGE_LOADED,retrieveProfileImage);
+      _bbm.bbmspUserProfileBox.addEventListener(ANEUserProfileBoxEvent.PROFILE_BOX_ICN_RET,retrieveIcon);
    }
    
    public function init(e:Event):void {
@@ -249,53 +258,42 @@ class ProfileCard extends Sprite {
       cls.width = 250;
       cls.height = 80;
       cls.x = (stage.stageWidth - 250) / 2;
-      cls.y = this.height-100;
+      cls.y = this.height-95;
       cls.addEventListener(MouseEvent.CLICK,closeProfile);
       addChild(cls);
       
-      var profile:Container = new Container();
-      profile.height = this.height-125;
-      profile.width = this.width-30;      
-      profile.y = 15;
-      profile.x = 15;
-      profile.setActualSize(this.width-30,this.height-115);
-      
-      profile.scrollDirection = ScrollDirection.VERTICAL;
-      profile.vScrollVisible = true;
-      addChild(profile);
-      
       img = new Sprite();
-      img.x = this.width - 255;
-      img.y = 0;
+      img.x = this.width - 235;
+      img.y = 10;
       img.graphics.beginFill(0xAAAAAA,0.8);
       img.graphics.drawRoundRect(0,0,120,120,20);
       img.graphics.endFill();
       img.addEventListener(MouseEvent.CLICK,callLoadImage);
       img.addChild(_pic);
-      profile.addChild(img);
+      addChild(img);
       
       var name:TextInput = new TextInput();
       name.editable = true;
-      name.x = 0;
-      name.y = 0;
+      name.x = 10;
+      name.y = 10;
       name.text = _bbm.bbmspUserProfile.getUserDisplayName();
       name.prompt = "Display Name";
       name.width = this.width - 265;
       name.height = 80;
-      profile.addChild(name);
+      addChild(name);
                 
       status = new ToggleSwitch();
       status.defaultLabel = "BUSY";
       status.selectedLabel = "AVAILABLE";
-      status.x = 0;
-      status.y = 90;
+      status.x = 10;
+      status.y = 95;
       status.width = this.width - 265;
       status.height = 80;
-      profile.addChild(status);
+      addChild(status);
       if( _bbm.bbmspUserProfile.getUserStatus() != "BUSY" ) status.selected = true;
       
       var version:Label = new Label();
-      version.x = 0;
+      version.x = 10;
       version.y = 180;
       version.width = this.width-265;
       version.height = 80;
@@ -304,74 +302,125 @@ class ProfileCard extends Sprite {
       tf.bold = true;
       tf.align = TextFormatAlign.CENTER;
       version.format = tf;
-      profile.addChild(version);
+      addChild(version);
+      
+      var info:Container = createContainer();
+      info.x = 10;
+      info.y = 265; 
+      info.width = this.width-20;
+      info.height = 180;
+      info.setActualSize(this.width-20,260);
+      info.scrollDirection = ScrollDirection.VERTICAL;
+      addChild(info);
       
       statMsg = new TextArea();
-      statMsg.x = 0;
-      statMsg.y = 265;
-      statMsg.width = this.width - 30;
-      statMsg.height = 120;
-      statMsg.maxLines = 3;
+      statMsg.minHeight = 125;      
+      statMsg.maxLines = 2;
       statMsg.maxChars = 160;
       statMsg.text = _bbm.bbmspUserProfile.getUserStatusMessage();
       statMsg.prompt = "Status Message";
-      profile.addChild(statMsg);
+      info.addChild(statMsg);
       
       persMsg = new TextArea();
-      persMsg.x = 0;
-      persMsg.y = 395;
-      persMsg.width = this.width - 30;
-      persMsg.height = 120;
-      persMsg.maxLines = 3;
+      persMsg.minHeight = 125;
+      persMsg.maxLines = 2;
       persMsg.maxChars = 160;
       persMsg.text = _bbm.bbmspUserProfile.getUserPersonalMessage();
       persMsg.prompt = "Personal Message";
-      profile.addChild(persMsg);
+      info.addChild(persMsg);
       
-      pb1 = new Container();
-      pb1.height = 160;
-      pb1.width = this.width-40;      
-      pb1.y = 520;
-      pb1.x = 5;
-      
-      pb2 = new Container();
-      pb2.height = 160;
-      pb2.width = this.width-40;      
-      pb2.y = 680;
-      pb2.x = 5;
-      
-      pb3 = new Container();
-      pb3.height = 160;
-      pb3.width = this.width-40;      
-      pb3.y = 840;
-      pb3.x = 5;
-      
+      var pBox:Container = new Container();
+      var pBoxLayout:GridLayout = new GridLayout(3);
+      pBoxLayout.paddingLeft = pBoxLayout.paddingRight = 5;
+      pBoxLayout.paddingTop = 5;
+      pBox.layout = pBoxLayout;      
+      var pBoxData:GridData = new GridData();
+      pBoxData.hAlign = pBoxData.vAlign = Align.CENTER;
+      pBoxData.setOptions( SizeOptions.NONE );
+      pBox.layoutData = pBoxData;
+      pBox.minHeight = 240;
+      pBox.minWidth = this.width-30;
+      pBox.scrollDirection = ScrollDirection.HORIZONTAL;
+      info.addChild(pBox);
+                
       for( var i:int = 0; i< _bbm.bbmspUserProfileBox.getProfileBoxSize(); ++i ){
-         var pb:Container = null;
-         if( i==0 ){ profile.addChild(pb1); pb = pb1; }
-         if( i==1 ){ profile.addChild(pb2); pb = pb2; }
-         if( i==2 ){ profile.addChild(pb3); pb = pb3; }
+         var pb:Container = new Container();
+         var iLayout:GridLayout = new GridLayout(2);
+         iLayout.paddingLeft = iLayout.paddingRight = 5;
+         iLayout.paddingTop = 5;
+         pb.layout = iLayout;         
+         var iData:GridData = new GridData();
+         iData.hAlign = iData.vAlign = Align.CENTER;
+         iData.setOptions( SizeOptions.NONE );
+         pb.layoutData = iData;
+         pb.setActualSize(this.width-40,230);
+         var bmp:Bitmap;
+         if( i==0 ) bmp = new Resources.MTile1();
+         if( i==1 ) bmp = new Resources.MTile2();
+         if( i==2 ) bmp = new Resources.MTile3();
+         pb.graphics.beginBitmapFill(bmp.bitmapData,null,true,false);
+         pb.graphics.drawRoundRect(0,0,this.width-40,230,25);
+         pb.graphics.endFill();
+         pBox.addChild(pb);
+                         
+         var icn:Container = new Container();
+         var icnLayout:GridLayout = new GridLayout(1);
+         icnLayout.paddingLeft = icnLayout.paddingRight = 5;
+         icnLayout.paddingTop = 5;
+         icn.layout = icnLayout;         
+         var icnData:GridData = new GridData(1,2);
+         icnData.hAlign = icnData.vAlign = Align.CENTER;
+         icnData.setOptions( SizeOptions.NONE );
+         icn.layoutData = icnData;
+         icn.setActualSize(160,230);
+         icn.minHeight = 230;
+         icn.minWidth = 160;
+         pb.addChild(icn);
+         
+         var icnID:int = _bbm.bbmspUserProfileBox.getIconID(i);
+         iconQueue.push(icnID);
+         trace("Requested icon "+icnID+" from profile box position "+i);         
+         var img:Image = new Image();         
+         icn.addChild(img);
          
          var txt:Label = new Label();
-         txt.width = pb.width - 160;
-         txt.height = 80;
-         txt.x = 160;
-         txt.y = 0;
+         txt.minHeight = 110;
+         txt.minWidth = this.width-200;
+         txt.minLines = 2;
          txt.text = _bbm.bbmspUserProfileBox.getText(i);
+         txt.graphics.beginFill(0xFFFFFF,0.7);
+         txt.graphics.drawRoundRect(0,0,this.width-208,107,25);
+         txt.graphics.endFill();
          pb.addChild(txt);
          
          var cke:Label = new Label();
-         cke.width = pb.width-160;
-         cke.height = 80;
-         cke.x = 160;
-         cke.y = 80;
+         cke.minHeight = 110;
+         cke.minWidth = this.width-200;
+         cke.minLines = 2;
          cke.text = _bbm.bbmspUserProfileBox.getCookie(i);
-         pb.addChild(cke);
-         
+         cke.graphics.beginFill(0xFFFFFF,0.7);
+         cke.graphics.drawRoundRect(0,0,this.width-208,107,25);
+         cke.graphics.endFill();
+         pb.addChild(cke);         
       }
-      
-      
+           
       this.y = stage.stageHeight/4;      
+   }
+   
+   private function createContainer():Container {
+      var container:Container = new Container();
+      
+      var layout:GridLayout = new GridLayout(1);
+      layout.paddingLeft = layout.paddingRight = 5;
+      layout.paddingTop = 5;
+      container.layout = layout;
+      
+      var data:GridData = new GridData();
+      data.hAlign = data.vAlign = Align.CENTER;
+      data.setOptions( SizeOptions.NONE );
+      container.layoutData = data;      
+      
+      return container;
    }
    
    private function cleanup(e:Event):void {
@@ -403,12 +452,14 @@ class ProfileCard extends Sprite {
    }
    
    private function displayImage(e:ANEImageEvent):void {
-      trace("calling display image after image sent to ANE for caching: "+e.id);
-      var pic:Bitmap = e.image;
-      pic.bitmapData = ImageResizer.bilinearIterative(pic.bitmapData,225,250,ResizeMath.METHOD_PAN_AND_SCAN);
-      img.addChild( new Bitmap(pic.bitmapData.clone()) );      
-      trace("Calling set user profile image");
-      _bbm.bbmspUserProfile.setUserProfileDisplayPicture(imgID);      
+      trace("[ProfileCard] Calling display image after image sent to ANE for caching: "+e.id);
+      if( e.id == imgID ){
+         var pic:Bitmap = e.image;
+         pic.bitmapData = ImageResizer.bilinearIterative(pic.bitmapData,225,250,ResizeMath.METHOD_PAN_AND_SCAN);
+         img.addChild( new Bitmap(pic.bitmapData.clone()) );      
+         trace("[ProfileCard] Calling set user profile image");
+         _bbm.bbmspUserProfile.setUserProfileDisplayPicture(imgID);
+      }
    }
    
    private function retrieveProfileImage(e:ANEImageEvent):void {
@@ -416,6 +467,10 @@ class ProfileCard extends Sprite {
       var id:Number = e.id;
       imgID = id;
       _bbm.bbmspImages.retrieveProfileImage(id);      
+   }
+   
+   private function retrieveIcon(e:ANEUserProfileBoxEvent):void {
+      
    }
 }
 
@@ -434,6 +489,7 @@ class ProfileBoxCard extends Sprite {
       this.addEventListener(Event.ADDED_TO_STAGE,init);  
       this.addEventListener(Event.REMOVED_FROM_STAGE,cleanup);      
       _bbm.bbmspImages.addEventListener(ANEImageEvent.IMAGE_LOADED,registerIcon);
+      _bbm.bbmspImages.addEventListener(ANEUserProfileBoxEvent.PROFILE_BOX_ICN_RET,retrieveIcon);
    }
    
    public function init(e:Event):void {
@@ -527,13 +583,14 @@ class ProfileBoxCard extends Sprite {
       
       this.y = stage.stageHeight/4;      
       
-      _bbm.bbmspImages.loadImageFromResource("ffvii_icon.jpg");
-      _bbm.bbmspImages.loadImageFromResource("zelda_icon.png");
-      _bbm.bbmspImages.loadImageFromResource("halo_icon.png");
+      if( !_bbm.bbmspUserProfileBox.retrieveIcon(1001) ) _bbm.bbmspImages.loadImageFromResource("ffvii_icon.jpg");
+      if( !_bbm.bbmspUserProfileBox.retrieveIcon(1002) ) _bbm.bbmspImages.loadImageFromResource("zelda_icon.png");
+      if( !_bbm.bbmspUserProfileBox.retrieveIcon(1003) ) _bbm.bbmspImages.loadImageFromResource("halo_icon.png");
    }
    
    private function cleanup(e:Event):void {
       _bbm.bbmspImages.removeEventListener(ANEImageEvent.IMAGE_LOADED,registerIcon);
+      _bbm.bbmspImages.removeEventListener(ANEUserProfileBoxEvent.PROFILE_BOX_ICN_RET,retrieveIcon);
    }
    
    private function registerIcon(e:ANEImageEvent):void {
@@ -544,6 +601,11 @@ class ProfileBoxCard extends Sprite {
          _bbm.bbmspUserProfileBox.registerIcon(e.id,1002);
       if( e.filename == "halo_icon.png" )
          _bbm.bbmspUserProfileBox.registerIcon(e.id,1003);
+   }
+   
+   private function retrieveIcon(e:ANEImageEvent):void {
+      var result:Number = _bbm.bbmspUserProfileBox.getImageIDFromIconID(e.id);
+      trace("Image id for stored icon "+e.id+" is "+result);
    }
    
    private function cancel(e:MouseEvent):void {                       

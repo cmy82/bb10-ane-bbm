@@ -70,6 +70,20 @@ package ane.bbm {
          return Number(result);
       }           
       
+      public function retrieveIcon(iconID:Number):Boolean {
+         trace("Checking to see if icon "+iconID+" has been previously registered");
+         var result:Object = _context.call( "bbm_ane_bbmsp_user_profile_box_retrieve_icon", iconID );
+         trace("Result: "+result.toString());
+         trace();
+         if( Number(result) < 0 ) return false;
+         return true;
+      }
+      
+      public function getImageIDFromIconID(iconID:Number):Number {
+         var result:Object = _context.call( "bbm_ane_get_image_by_icon_id", iconID );
+         return Number(result);
+      }
+      
       //======================================= UPDATE FUNCTIONS =================================
       public function addItem(text:String,cookie:String,icnID:Number = -1):void {
          trace("Calling add profile box item");
@@ -91,14 +105,9 @@ package ane.bbm {
       public function registerIcon(imageID:Number,iconID:Number):void {
          trace("registering icon "+imageID+" with id "+iconID);
          var result:Object = _context.call( "bbm_ane_bbmsp_user_profile_box_register_icon", iconID, imageID );
-         trace("Result: "+result.toString());
-         if( Number(result) < 0 ){
-            result = _context.call( "bbm_ane_bbmsp_user_profile_box_retrieve_icon", iconID );
-            trace("Result: "+result.toString());
-            trace();
-         }
+         trace("Result: "+result.toString());         
       }
-      
+                
       //======================================= MISCELLANEOUS FUNCTIONS =================================
       private function profileStatusUpdate(e:StatusEvent):void {
          if(e.code == ANEUserProfileBoxEvent.PROFILE_BOX_LOADED){
@@ -110,9 +119,9 @@ package ane.bbm {
          } else if(e.code == ANEUserProfileBoxEvent.PROFILE_BOX_ITM_DEL){
             dispatchEvent( new ANEUserProfileBoxEvent(ANEUserProfileBoxEvent.PROFILE_BOX_ITM_DEL) );
          } else if(e.code == ANEUserProfileBoxEvent.PROFILE_BOX_ICN_REG){
-            dispatchEvent( new ANEUserProfileBoxEvent(ANEUserProfileBoxEvent.PROFILE_BOX_ICN_REG) );
+            dispatchEvent( new ANEUserProfileBoxEvent(ANEUserProfileBoxEvent.PROFILE_BOX_ICN_REG,Number(e.level)) );
          } else if(e.code == ANEUserProfileBoxEvent.PROFILE_BOX_ICN_RET){
-            dispatchEvent( new ANEUserProfileBoxEvent(ANEUserProfileBoxEvent.PROFILE_BOX_ICN_RET) );
+            dispatchEvent( new ANEUserProfileBoxEvent(ANEUserProfileBoxEvent.PROFILE_BOX_ICN_RET,Number(e.level)) );
          }
       }
    }
