@@ -267,6 +267,11 @@ static void* initAneThread(void *data){
               bbmsp_event_get_type(event, &eventType);
               bbmsp_event_get(event, &bbmspEvent);
 
+              cout << "BPS Event recieved in ANE thread" << endl;
+              cout << "Category: " << eventCategory << endl;
+              cout << "Type: " << eventType << endl;
+              cout << endl;
+
               if( eventCategory == BBMSP_USER_PROFILE ){
                  if( eventType == BBMSP_SP_EVENT_PROFILE_CHANGED ){
                     cout << "============BBMSP Profile Changed Event Received===========" << endl;

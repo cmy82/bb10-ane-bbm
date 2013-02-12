@@ -372,15 +372,26 @@ class ProfileCard extends Sprite {
          icnData.hAlign = icnData.vAlign = Align.CENTER;
          icnData.setOptions( SizeOptions.NONE );
          icn.layoutData = icnData;
-         icn.setActualSize(160,230);
-         icn.minHeight = 230;
-         icn.minWidth = 160;
+         icn.setActualSize(140,220);
+         icn.minHeight = 220;
+         icn.minWidth = 140;
          pb.addChild(icn);
          
          var icnID:int = _bbm.bbmspUserProfileBox.getIconID(i);
          iconQueue.push(icnID);
          trace("Requested icon "+icnID+" from profile box position "+i);         
          var img:Image = new Image();         
+         //Retrieve Icon does not work so if wanting to show your ProfileBoxIcons you will have to do so manually
+         if(icnID==1001){
+            bmp = new Resources.FFVII();
+            img.setImage( ImageResizer.bilinearIterative(bmp.bitmapData,140,220,ResizeMath.METHOD_PAN_AND_SCAN) );
+         } else if(icnID==1002){
+            bmp = new Resources.ZELDA();
+            img.setImage( ImageResizer.bilinearIterative(bmp.bitmapData,140,220,ResizeMath.METHOD_PAN_AND_SCAN) );
+         } else if(icnID==1003){
+            bmp = new Resources.HALO();
+            img.setImage( ImageResizer.bilinearIterative(bmp.bitmapData,140,220,ResizeMath.METHOD_PAN_AND_SCAN) );
+         }
          icn.addChild(img);
          
          var txt:Label = new Label();
@@ -427,6 +438,7 @@ class ProfileCard extends Sprite {
       this.removeEventListener(Event.REMOVED_FROM_STAGE,cleanup);
       _bbm.bbmspImages.removeEventListener(ANEImageEvent.PROF_IMAGE_RETRIEVED,displayImage);   
       _bbm.bbmspImages.removeEventListener(ANEImageEvent.IMAGE_LOADED,retrieveProfileImage);
+      _bbm.bbmspUserProfileBox.removeEventListener(ANEUserProfileBoxEvent.PROFILE_BOX_ICN_RET,retrieveIcon);
    }
    
    private function closeProfile(e:MouseEvent):void {
