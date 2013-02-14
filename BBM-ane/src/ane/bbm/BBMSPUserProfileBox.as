@@ -71,10 +71,7 @@ package ane.bbm {
       }           
       
       public function retrieveIcon(iconID:Number):Boolean {
-         trace("Checking to see if icon "+iconID+" has been previously registered");
          var result:Object = _context.call( "bbm_ane_bbmsp_user_profile_box_retrieve_icon", iconID );
-         trace("Result: "+result.toString());
-         trace();
          if( Number(result) < 0 ) return false;
          return true;
       }
@@ -86,12 +83,7 @@ package ane.bbm {
       
       //======================================= UPDATE FUNCTIONS =================================
       public function addItem(text:String,cookie:String,icnID:Number = -1):void {
-         trace("Calling add profile box item");
-         trace(text);
-         trace(cookie);
-         trace(icnID);
-         var result:Object = _context.call( "bbm_ane_bbmsp_user_profile_box_add_item",icnID,text,text.length,cookie,cookie.length);
-         trace("result: "+result.toString());
+         var result:Object = _context.call( "bbm_ane_bbmsp_user_profile_box_add_item",icnID,text,text.length,cookie,cookie.length);         
       }
       
       public function removeItem(item:Number):void {
@@ -103,9 +95,7 @@ package ane.bbm {
       }
            
       public function registerIcon(imageID:Number,iconID:Number):void {
-         trace("registering icon "+imageID+" with id "+iconID);
-         var result:Object = _context.call( "bbm_ane_bbmsp_user_profile_box_register_icon", iconID, imageID );
-         trace("Result: "+result.toString());         
+         var result:Object = _context.call( "bbm_ane_bbmsp_user_profile_box_register_icon", iconID, imageID );                  
       }
                 
       //======================================= MISCELLANEOUS FUNCTIONS =================================

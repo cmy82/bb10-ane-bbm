@@ -167,7 +167,6 @@
                 
       private function retrieveImage(e:ANEImageEvent):void {         
          if( profLoading ){
-            trace("[ANE Test] Calling retrieve image for loaded profile image "+e.id);
             var id:Number = e.id;
             imgId = id;
             bbmExtension.bbmspImages.retrieveImage(id);
@@ -379,7 +378,6 @@ class ProfileCard extends Sprite {
          
          var icnID:int = _bbm.bbmspUserProfileBox.getIconID(i);
          iconQueue.push(icnID);
-         trace("Requested icon "+icnID+" from profile box position "+i);         
          var img:Image = new Image();         
          //Retrieve Icon does not work so if wanting to show your ProfileBoxIcons you will have to do so manually
          if(icnID==1001){
@@ -450,7 +448,6 @@ class ProfileCard extends Sprite {
       if( status.selected ) cStat = "AVAILABLE";
       if( (_bbm.bbmspUserProfile.getUserStatusMessage() != statMsg.text) ||
           (_bbm.bbmspUserProfile.getUserStatus() != cStat) ){
-         trace(cStat);         
          var code:int = 1;
          if( status.selected ) code = 0;
          _bbm.bbmspUserProfile.setUserProfileStatus( code, statMsg.text );
@@ -464,18 +461,15 @@ class ProfileCard extends Sprite {
    }
    
    private function displayImage(e:ANEImageEvent):void {
-      trace("[ProfileCard] Calling display image after image sent to ANE for caching: "+e.id);
       if( e.id == imgID ){
          var pic:Bitmap = e.image;
          pic.bitmapData = ImageResizer.bilinearIterative(pic.bitmapData,225,250,ResizeMath.METHOD_PAN_AND_SCAN);
          img.addChild( new Bitmap(pic.bitmapData.clone()) );      
-         trace("[ProfileCard] Calling set user profile image");
          _bbm.bbmspUserProfile.setUserProfileDisplayPicture(imgID);
       }
    }
    
    private function retrieveProfileImage(e:ANEImageEvent):void {
-      trace("[ProfileCard] Retrieve profile image called for id "+e.id);
       var id:Number = e.id;
       imgID = id;
       _bbm.bbmspImages.retrieveProfileImage(id);      
@@ -606,7 +600,6 @@ class ProfileBoxCard extends Sprite {
    }
    
    private function registerIcon(e:ANEImageEvent):void {
-      trace(e.filename);
       if( e.filename == "ffvii_icon.jpg" )
          _bbm.bbmspUserProfileBox.registerIcon(e.id,1001);
       if( e.filename == "zelda_icon.png" )
@@ -616,8 +609,7 @@ class ProfileBoxCard extends Sprite {
    }
    
    private function retrieveIcon(e:ANEImageEvent):void {
-      var result:Number = _bbm.bbmspUserProfileBox.getImageIDFromIconID(e.id);
-      trace("Image id for stored icon "+e.id+" is "+result);
+      var result:Number = _bbm.bbmspUserProfileBox.getImageIDFromIconID(e.id);      
    }
    
    private function cancel(e:MouseEvent):void {                       

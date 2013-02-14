@@ -145,7 +145,6 @@ package ane.bbm {
        * 
        */
       public function setStatusMessage(status:int,msg:String = ""):void {
-         trace("Set profile status msg: "+msg);
          if( msg == null ) msg = " ";
          this._context.call( "bbm_ane_bbmsp_profile_set_status", status, msg, msg.length );
       }
@@ -159,7 +158,6 @@ package ane.bbm {
        * 
        */
       public function setUserProfileStatus(status:int,msg:String):void {
-         trace("Set user status msg: "+msg);
          if( msg == null ) msg = " ";
          this._context.call( "bbm_ane_bbmsp_set_user_profile_status", status, msg, msg.length );
       }
@@ -172,7 +170,6 @@ package ane.bbm {
        * 
        */
       public function setPersonalMessage(msg:String):void {
-         trace("Set profile personal msg: "+msg);
          if( msg == null ) msg = " ";
          this._context.call( "bbm_ane_bbmsp_profile_set_personal_message", msg, msg.length );
       }
@@ -185,7 +182,6 @@ package ane.bbm {
        * 
        */
       public function setUserProfilePersonalMessage(msg:String):void {
-         trace("Set user personal msg: "+msg);
          if( msg == null ) msg = " ";
          this._context.call( "bbm_ane_bbmsp_set_user_profile_personal_message", msg, msg.length );
       }

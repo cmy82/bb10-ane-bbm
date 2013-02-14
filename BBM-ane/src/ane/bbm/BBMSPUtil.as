@@ -130,7 +130,6 @@ package ane.bbm {
          var rect:Rectangle = new Rectangle(0,0,img.width,img.height);
          var data:ByteArray = img.bitmapData.getPixels(rect);
          
-         trace("trying to load from bitmap with a size of "+img.width+"x"+img.height);
          if( search(name) == false ){            
             var result:Object = 
                this._context.call( "bbm_ane_bbmsp_image_create_from_data", data.length, data, img.width, img.height );
@@ -150,7 +149,6 @@ package ane.bbm {
        */
       public function loadImageFromResource(loc:String):void {
         var rsrcFile:File = File.applicationDirectory.resolvePath(loc);
-        trace(rsrcFile.nativePath);
         var rsrcStream:FileStream = new FileStream();
         rsrcStream.open(rsrcFile,FileMode.READ);
         var rsrcBytes:ByteArray = new ByteArray();
@@ -202,6 +200,8 @@ package ane.bbm {
          var size:Object = this._context.call( "bbm_ane_bbmsp_image_get_data_size", id );
          var imgData:ByteArray = new ByteArray();
          imgData.length = Number(size);
+         if( imgData.length < 1 ) return;
+         
          this._context.call( "bbm_ane_bbmsp_image_get_data", id, imgData );
          var loader:Loader = new Loader();
          loader.contentLoaderInfo.addEventListener(Event.COMPLETE,imageRetrieved)
@@ -220,6 +220,8 @@ package ane.bbm {
          var size:Object = this._context.call( "bbm_ane_image_get_profile_data_size", id );
          var imgData:ByteArray = new ByteArray();
          imgData.length = Number(size);
+         if( imgData.length < 1 ) return;         
+         
          this._context.call( "bbm_ane_image_get_profile_data", id, imgData );
          var loader:Loader = new Loader();
          loader.contentLoaderInfo.addEventListener(Event.COMPLETE,profileImageRetrieved)
@@ -259,7 +261,6 @@ package ane.bbm {
             var id:Number = Number(e.level);
             var tracker:ImageTracker = findByID(id);
             if( tracker == null ){
-               trace("ID: "+id+" not found");
                return;
             }
             var file:String = findByID(id).name;
