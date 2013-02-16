@@ -1,5 +1,4 @@
 # bb10-ane-bbm
-# ============
 
 **My BBMID for my DevAlpha is CMY2 and the PIN is 29D9370E.**
 
