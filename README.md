@@ -21,3 +21,6 @@ Each time you start your application you need to register with your uuid. The AN
 
 ## The Test App
 The status button has no purpose as the view was changed to update automatically. You will need to click the register button first before doing anything else. Once you have registered, you can click any of the buttons in any order. When viewing the profile, if you make any changes to the text or status, it will prompt you to accept the changes and _**WILL ACTUALLY CHANGE**_ your BBM profile. When adding a profile box item, move the slider under the icon to use and add the text (and cookie if desired) and select ok. Note that you are not prompted to accept changes to the profile box.
+
+## Disclaimer
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
