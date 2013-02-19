@@ -2,7 +2,7 @@
 
 **My BBMID for my DevAlpha is CMY2 and the PIN is 29D9370E.**
 
-This is AIR Native Extension (ANE) to allow BlackBerry 10 AIR apps access to the BBM Social Platform (BBMSP). This repository contains all of the needed files including a pre-built copy of the ANE, and the source (if you want to adjust or tinker with it). There are three applications included in the bundle. There is an c/c++ library that contains the native code (bbmsp-ane), the corresponding AIR library (BBM-ane), and a test application to show how the features work (BBM_ANE_Test). Only the two library files are needed to gain access to the BBMSP; just import them into your workspace and add the references to your project(s). To simplify things, each file in the AIR library is matched to a file of the same name in the c/c++ library with corresponding matching functions. 
+This is an AIR Native Extension (ANE) to allow BlackBerry 10 AIR apps access to the BBM Social Platform (BBMSP). This repository contains all of the needed files including a pre-built copy of the ANE, and the source (if you want to adjust or tinker with it). There are three applications included in the bundle. There is a c/c++ library that contains the native code (bbmsp-ane), the corresponding AIR library (BBM-ane), and a test application to show how the features work (BBM_ANE_Test). Only the two library files are needed to gain access to the BBMSP; just import them into your workspace and add the references to your project(s). To simplify things, each file in the AIR library is matched to a file of the same name in the c/c++ library with corresponding matching functions. 
 
 ## The following features are enabled through this ANE:
 * Registering with the BBMSP
