@@ -5,14 +5,20 @@
 This is an AIR Native Extension (ANE) to allow BlackBerry 10 AIR apps access to the BBM Social Platform (BBMSP). This repository contains all of the needed files including a pre-built copy of the ANE, and the source (if you want to adjust or tinker with it). There are three applications included in the bundle. There is a c/c++ library that contains the native code (bbmsp-ane), the corresponding AIR library (BBM-ane), and a test application to show how the features work (BBM_ANE_Test). Only the two library files are needed to gain access to the BBMSP; just import them into your workspace and add the references to your project(s). To simplify things, each file in the AIR library is matched to a file of the same name in the c/c++ library with corresponding matching functions. 
 
 ## The following features are enabled through this ANE:
+## Enabled through use of the BBM Social Platform
 * Registering with the BBMSP
 * Sending download invites for your application
 * Updating user profile (picture, status, status message)
 * Updating user profile box
 
+## Enabled through use of the Invocation framework
+* Sending messages - Messages can be sent in two ways: 
+  (1)You can open a chat with a contact if you know the contacts PIN by using the (BBMAne).bbmInvoke.startChat(pin) function. If the pin is not a contact or left blank then the invite screen is displayed. (Currently not useable as the function to lookup contacts is not complete. Also this can only be used to start a chart with users who also have your app installed.)
+  (2)You can share a message and choose the contact using the contact picker by using the (BBMAne).bbmInvoke.sendMessage(message) function.
+* Sending images
+
 ## The following features are not enabled/complete and why:
-* Sending messages (this feature is not enabled in the BBMSP currently)
-* User contacts (since you are unable to send messages or files the only useful purpose for this I saw was to get a list of contacts that have you app installed)
+* User contacts (in progress)
 
 
 ## Usage/Caveats:
