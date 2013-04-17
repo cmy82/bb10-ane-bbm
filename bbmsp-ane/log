@@ -1,5 +1,17 @@
 err: config: Failed to open file (/etc/system/config/qnxair_variant.conf): No such file or directory	(tid:1)
 Waiting on BPS event in profile box thread
+Received BPS event in Main Thread
+Initializing struct to hold SL Controllers and data
+Starting SL thread
+Initializing BPS
+Registering domain and getting channel
+Initializing SC_InitData struct
+Setting domain
+Zeroing appData memory
+Received BPS event in Main Thread
+Received BPS event in Main Thread
+Received event in Registration thread
+Received BPS event in Main Thread
 BPS event received in profile box thread
 Starting loading of profile box
 Loaded user profile box
@@ -13,6 +25,9 @@ size of profile picture: 8342
 creating struct to hold images and inserting into map cache
 pushed images into the map
 Original image size: 8342
-Attempting to retrieve icon 1001
-Attempting to retrieve icon 1002
-Attempting to retrieve icon 1003
+[0][-1]    0
+Name: C
+[0][-1]    0
+Status Msg: g
+[0][-1]    0
+Personal Msg: w

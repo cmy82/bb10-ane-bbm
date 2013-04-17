@@ -1,11 +1,11 @@
-package ane.bbm {
+package ane.bbm.platform {
    import flash.external.ExtensionContext;
    
-   public class BBMMessaging {
+   public class BBMSPMessaging {
       
       private var _context:ExtensionContext;
       
-      public function BBMMessaging(context:ExtensionContext) {
+      public function BBMSPMessaging(context:ExtensionContext) {
          _context = context;
       }
       

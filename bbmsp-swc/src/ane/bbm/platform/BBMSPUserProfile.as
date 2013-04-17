@@ -1,4 +1,4 @@
-package ane.bbm {
+package ane.bbm.platform {
    import ane.bbm.events.ANEUserProfileEvent;
    
    import flash.display.Bitmap;

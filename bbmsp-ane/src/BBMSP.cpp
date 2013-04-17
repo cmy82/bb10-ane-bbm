@@ -63,6 +63,7 @@ void* initRegistrationThread(void *data){
       bps_get_event(&bps_event, -1);
       //If no BPS event is returned (ex if init failed) then cancel the event query
       if (!bps_event) return NULL;
+      cout << "Received event in Registration thread" << endl;
 
       int eventDomain;
       int eventCode;
@@ -75,6 +76,7 @@ void* initRegistrationThread(void *data){
       }
 
       if(progress == REGISTRATION_STOPPED){
+         cout << "Registration has finished" << endl;
          registrationComplete();
          break;
       }
@@ -138,7 +140,7 @@ static void bbmspProcessRegistration(const bbmsp_access_error_codes_t status){
       // Registration is in progress. Check the status to see if it finished.
       case REGISTRATION_STARTED:
          // Ignore. This means the registration is in progress.
-         if (status == BBMSP_ACCESS_PENDING) return;
+         if (status == BBMSP_ACCESS_PENDING){ cout << "Access is pending." << endl; return; }
          // Registration is done.
          if (bbmsp_is_access_allowed()) {
             progress = REGISTRATION_STOPPED;

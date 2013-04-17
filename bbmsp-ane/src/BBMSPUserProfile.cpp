@@ -164,9 +164,9 @@ FREObject bbm_ane_bbmsp_set_user_profile_status(FREContext ctx, void* functionDa
    cout << "length: " << length << endl;
 
    char *msg = (char*) malloc(length+1);
-   msg[length] = '\0';
    FREGetObjectAsUTF8( argv[1], &length, &value );
    strncpy(msg,(char*)value,length);
+   msg[length] = '\0';
    cout << "msg: " << *msg << endl;
 
    if( status == 0 ){
@@ -191,9 +191,9 @@ FREObject bbm_ane_bbmsp_set_user_profile_personal_message(FREContext ctx, void* 
    cout << "length: " << length << endl;
 
    char *msg = (char*) malloc(length+1);
-   msg[length] = '\0';
    FREGetObjectAsUTF8( argv[0], &length, &value );
-   strncpy(msg,(char *)value,length);
+   strncpy(msg,(char*)value,length);
+   msg[length] = '\0';
    cout << "msg: " << *msg << endl;
 
    bbmsp_result_t code = bbmsp_set_user_profile_personal_message((const char*)msg);
@@ -234,6 +234,9 @@ FREObject bbm_ane_bbmsp_profile_get_display_name(FREContext ctx, void* functionD
    char *name = new char[BBMSP_PROFILE_DISPLAY_NAME_MAX];
    bbmsp_result_t code = bbmsp_profile_get_display_name(userProfile,name,BBMSP_PROFILE_DISPLAY_NAME_MAX);
 
+   cout << "[" << BBMSP_SUCCESS << "]" << "[" << BBMSP_FAILURE << "]" << "    " << code << endl;
+   cout << "Name: " << *name << endl;
+
    FREObject result;
    FRENewObjectFromUTF8((uint32_t)(strlen(name)+1), (uint8_t*)name, &result);
    return result;
@@ -244,11 +247,14 @@ FREObject bbm_ane_bbmsp_profile_get_display_name(FREContext ctx, void* functionD
 //                                                            size_t buffer_size);
 FREObject bbm_ane_bbmsp_profile_get_personal_message(FREContext ctx, void* functionData,
                                                      uint32_t argc, FREObject argv[]){
-   char *name = new char[BBMSP_PROFILE_PERSONAL_MSG_MAX];
-   bbmsp_result_t code = bbmsp_profile_get_personal_message(userProfile,name,BBMSP_PROFILE_PERSONAL_MSG_MAX);
+   char *msg = new char[BBMSP_PROFILE_PERSONAL_MSG_MAX];
+   bbmsp_result_t code = bbmsp_profile_get_personal_message(userProfile,msg,BBMSP_PROFILE_PERSONAL_MSG_MAX);
+
+   cout << "[" << BBMSP_SUCCESS << "]" << "[" << BBMSP_FAILURE << "]" << "    " << code << endl;
+   cout << "Personal Msg: " << *msg << endl;
 
    FREObject result;
-   FRENewObjectFromUTF8((uint32_t)(strlen(name)+1), (uint8_t*)name, &result);
+   FRENewObjectFromUTF8((uint32_t)(strlen(msg)+1), (uint8_t*)msg, &result);
    return result;
 }
 
@@ -280,11 +286,14 @@ FREObject bbm_ane_bbmsp_profile_get_status(FREContext ctx, void* functionData,
 //                                                          size_t buffer_size);
 FREObject bbm_ane_bbmsp_profile_get_status_message(FREContext ctx, void* functionData,
                                                    uint32_t argc, FREObject argv[]){
-   char *name = new char[BBMSP_PROFILE_STATUS_MSG_MAX];
-   bbmsp_result_t code = bbmsp_profile_get_status_message(userProfile,name,BBMSP_PROFILE_STATUS_MSG_MAX);
+   char *msg = new char[BBMSP_PROFILE_STATUS_MSG_MAX];
+   bbmsp_result_t code = bbmsp_profile_get_status_message(userProfile,msg,BBMSP_PROFILE_STATUS_MSG_MAX);
+
+   cout << "[" << BBMSP_SUCCESS << "]" << "[" << BBMSP_FAILURE << "]" << "    " << code << endl;
+   cout << "Status Msg: " << *msg << endl;
 
    FREObject result;
-   FRENewObjectFromUTF8((uint32_t)(strlen(name)+1), (uint8_t*)name, &result);
+   FRENewObjectFromUTF8((uint32_t)(strlen(msg)+1), (uint8_t*)msg, &result);
    return result;
 }
 

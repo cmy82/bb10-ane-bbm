@@ -37,7 +37,7 @@
         </excludedEntries>
       </libraryPathEntry>
       <libraryPathEntry kind="1" linkType="1" path="${BLACKBERRY_TABLET_SDK}/frameworks/libs/qnx"/>
-      <libraryPathEntry kind="3" linkType="1" path="X:/BBDEV/PlayBook/Flash Builder/BBM-ane/bin/BBM-ane.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="3" linkType="1" path="X:/BBDEV/PlayBook/Flash Builder/bbmsp-swc/packaged-lib/bbmsp-swc.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="5" linkType="2" path="${BLACKBERRY_TABLET_SDK}/frameworks/libs/qnx/ane/QNXSkins.ane"/>
       <libraryPathEntry kind="5" linkType="2" path="X:/BBDEV/QNX/WKSPCE/bbmsp-ane/packaged-ane/bbmsp-ane.ane"/>
       <libraryPathEntry kind="5" linkType="2" path="X:/BBDEV/QNX/WKSPCE/HelloAIR/packaged-ane/HelloAIR.ane"/>

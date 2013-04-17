@@ -45,13 +45,16 @@ ane_thread_state_e aneThreadState = INITIALIZING;
 void BBMANEExtensionInitializer(void** extDataToSet,
 		                          FREContextInitializer* ctxInitializerToSet,
 		                          FREContextFinalizer* ctxFinalizerToSet);
+
 void BBMANEExtensionFinalizer();
 
 void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext ctx,
 		                        uint32_t* numFunctionsToSet, const FRENamedFunction** functionsToSet);
+
 void BBMANEContextFinalizer(FREContext ctx);
 
 FREObject checkStatus(FREContext ctx, void* functionData, uint32_t argc, FREObject argv[]);
+
 static void bpsEventComplete(bps_event_t *event);
 
 //======================================================================================//
@@ -198,6 +201,7 @@ static void* initAneThread(void *data){
 
               bps_get_event(&event, -1);
               eventDomain = bps_event_get_domain(event);
+              cout << "Received BPS event in Main Thread" << endl;
 
               if (bps_event_get_domain(event) == bbmsp_get_domain()) {
                  bbmsp_event_t *bbmsp_event;
@@ -522,6 +526,13 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                    "bbm_ane_bbmsp_user_profile_box_remove_all_items",
                                    "bbm_ane_bbmsp_user_profile_box_register_icon",
                                    "bbm_ane_bbmsp_user_profile_box_retrieve_icon",
+                                   //INVOCATION
+                                   "bbm_ane_invoke_start_chat",
+                                   "bbm_ane_invoke_change_avatar",
+                                   "bbm_ane_invoke_invite_to_bbm",
+                                   "bbm_ane_invoke_send_message",
+                                   "bbm_ane_invoke_send_file",
+                                   "bbm_ane_invoke_send_image",
                                    NULL };
 	FREFunction functionPtrs[] = { checkStatus,
 	                               bbm_ane_startRegistration,
@@ -564,6 +575,12 @@ void BBMANEContextInitializer(void* extData, const uint8_t* ctxType, FREContext 
                                   bbm_ane_bbmsp_user_profile_box_remove_all_items,
                                   bbm_ane_bbmsp_user_profile_box_register_icon,
                                   bbm_ane_bbmsp_user_profile_box_retrieve_icon,
+                                  bbm_ane_invoke_start_chat,
+                                  bbm_ane_invoke_change_avatar,
+                                  bbm_ane_invoke_invite_to_bbm,
+                                  bbm_ane_invoke_send_message,
+                                  bbm_ane_invoke_send_file,
+                                  bbm_ane_invoke_send_image,
                                   NULL };
 
 	// count number of functions

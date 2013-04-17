@@ -39,6 +39,7 @@
 #include "BBMSPUserProfile.h"
 #include "BBMSPUserProfileBox.h"
 
+#include "BBMInvoke.h"
 
 #ifndef BBMANE_GLOBALS_H_
 #define BBMANE_GLOBALS_H_

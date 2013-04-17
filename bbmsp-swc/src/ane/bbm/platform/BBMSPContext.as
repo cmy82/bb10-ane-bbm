@@ -1,4 +1,4 @@
-package ane.bbm {
+package ane.bbm.platform {
    import flash.external.ExtensionContext;
 
    public class BBMSPContext {

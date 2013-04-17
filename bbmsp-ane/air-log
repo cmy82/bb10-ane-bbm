@@ -1,2 +1,0 @@
-000 ---- 2013-02-03 01:22:02  --------------------------
-err: extension: failed to load /accounts/1000/appdata/BBM.ANE.Test.debug.testDev__Test_debugeeaca80e/app/air/META-INF/AIR/extensions/BSLLC.library.ane.BBM/META-INF/ANE/QNX-ARM/libbbmsp-ane-arm.so: Unresolved symbols	(tid:1)
