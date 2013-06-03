@@ -38,7 +38,8 @@ package ane.bbm.invoke {
       
       /**
        * Send an image over BBM
-       * Opens contact picker to allow user to choose contact
+       * If image path is specified then BBM is opened with that image, otherwise the file picker is shown to allow
+       * the user to pick an image to send.
        * @param String Image to send
        * @return none
        * 
@@ -49,8 +50,43 @@ package ane.bbm.invoke {
             var dir:File = File.userDirectory.resolvePath( 'shared/photos' );
             var imgFilter:FileFilter = new FileFilter("Images", "*.png;*.bmp;*.jpg;*.jpeg");
             dir.addEventListener(Event.SELECT,imageSelected);
-            dir.browseForOpen("Choose Image",[imgFilter]);
-            //this._context.call( "bbm_ane_invoke_send_message" );         
+            dir.browseForOpen("Choose Image",[imgFilter]);         
+         }
+      }
+      
+      /**
+       * Send an file over BBM
+       * If file path is specified then BBM is opened with that image, otherwise the file picker is shown to allow
+       * the user to pick an file to send.
+       * @param String Image to send
+       * @return none
+       * 
+       */
+      public function sendFile(file:String=null):void {         
+         if(file!=null) this._context.call( "bbm_ane_invoke_send_file", file, file.length );
+         else {
+            var dir:File = File.userDirectory.resolvePath( 'shared/photos' );
+            var imgFilter:FileFilter = new FileFilter("Files", "*");
+            dir.addEventListener(Event.SELECT,fileSelected);
+            dir.browseForOpen("Choose File",[imgFilter]);         
+         }
+      }
+      
+      /**
+       * Change BBM profile avatar
+       * If image path is specified then editor is opened with that image, otherwise the file picker is shown to allow
+       * the user to pick an image to crop.
+       * @param String Image to send
+       * @return none
+       * 
+       */
+      public function changeAvatar(image:String=null):void {         
+         if(image!=null) this._context.call( "bbm_ane_invoke_change_avatar", image, image.length );
+         else {
+            var dir:File = File.userDirectory.resolvePath( 'shared/photos' );
+            var imgFilter:FileFilter = new FileFilter("Images", "*.png;*.bmp;*.jpg;*.jpeg");
+            dir.addEventListener(Event.SELECT,avatarSelected);
+            dir.browseForOpen("Choose Image",[imgFilter]);         
          }
       }
       
@@ -68,10 +104,17 @@ package ane.bbm.invoke {
       //============================================ PRIVATE FUNCTIONS ==============================================//
       private function imageSelected(e:Event):void {
          var imageFile:File = e.target as File;
-         trace(imageFile.nativePath)
-         trace(imageFile.name);
-         trace(imageFile.extension);
          this._context.call( "bbm_ane_invoke_send_image", imageFile.nativePath, imageFile.nativePath.length );
       }
+      
+      private function fileSelected(e:Event):void {
+         var file:File = e.target as File;
+         this._context.call( "bbm_ane_invoke_send_file", file.nativePath, file.nativePath.length );
+      }
+      
+      private function avatarSelected(e:Event):void {
+         var imageFile:File = e.target as File;
+         this._context.call( "bbm_ane_invoke_change_avatar", imageFile.nativePath, imageFile.nativePath.length );
+      }      
    }
 }
